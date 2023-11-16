@@ -1,3 +1,3 @@
 # Elm Integer
 
-A pure Elm liibrary for computing with the integers.
+A pure Elm library for computing with the integers.

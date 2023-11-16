@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+cd "${project:?}" && \
+  elm-format         \
+    src              \
+    tests            \
+    "${@:---yes}"
