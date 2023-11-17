@@ -1,7 +1,7 @@
 module Test.Integer exposing (suite)
 
 import Expect
-import Fuzz
+import Fuzz exposing (Fuzzer)
 import Integer as Z
 import Test exposing (Test, describe, fuzz, test)
 
@@ -11,6 +11,7 @@ suite =
     describe "Integer"
         [ intConversionSuite
         , constantsSuite
+        , baseBStringConversionSuite
         ]
 
 
@@ -123,3 +124,115 @@ constantsSuite =
                 Z.negativeTen
                     |> Expect.equal (Z.fromSafeInt -10)
         ]
+
+
+baseBStringConversionSuite : Test
+baseBStringConversionSuite =
+    describe "fromBaseBString / toBaseBString conversion"
+        [ fuzz baseBString "base b string" <|
+            \( b, s ) ->
+                Z.fromBaseBString b s
+                    |> Maybe.andThen (Z.toBaseBString b)
+                    |> Expect.equal (Just <| toCanonicalBaseBString s)
+        ]
+
+
+
+-- CUSTOM FUZZERS
+
+
+baseBString : Fuzzer ( Int, String )
+baseBString =
+    --
+    -- Generate random signed base b (2 <= b <= 36) strings
+    -- of at least 1 character and at most 100 characters.
+    --
+    sign
+        |> Fuzz.andThen
+            (\s ->
+                Fuzz.intRange 2 36
+                    |> Fuzz.andThen
+                        (\b ->
+                            Fuzz.listOfLengthBetween 1 100 (baseBChar b)
+                                |> Fuzz.map
+                                    (\l ->
+                                        ( b, s ++ String.fromList l )
+                                    )
+                        )
+            )
+
+
+sign : Fuzzer String
+sign =
+    Fuzz.oneOfValues
+        [ "" -- +ve
+        , "-" -- -ve
+        ]
+
+
+baseBChar : Int -> Fuzzer Char
+baseBChar b =
+    if 2 <= b && b <= 36 then
+        Fuzz.uniformInt (b - 1)
+            |> Fuzz.map
+                (\offset ->
+                    Char.fromCode <|
+                        if offset < 10 then
+                            0x30 + offset
+
+                        else
+                            (if modBy 2 offset == 0 then
+                                0x61
+
+                             else
+                                0x41
+                            )
+                                + offset
+                                - 10
+                )
+
+    else
+        Fuzz.invalid "baseBChar: the base must be between 2 and 36 inclusive"
+
+
+
+-- HELPERS
+
+
+toCanonicalBaseBString : String -> String
+toCanonicalBaseBString input =
+    case String.uncons input of
+        Just ( c, restInput ) ->
+            if c == '-' then
+                let
+                    magnitude =
+                        restInput
+                            |> removeLeadingZeros
+                            |> String.toUpper
+                in
+                if magnitude == "0" then
+                    magnitude
+
+                else
+                    String.cons '-' magnitude
+
+            else
+                input
+                    |> removeLeadingZeros
+                    |> String.toUpper
+
+        Nothing ->
+            input
+
+
+removeLeadingZeros : String -> String
+removeLeadingZeros s =
+    case String.uncons s of
+        Just ( _, "" ) ->
+            s
+
+        Just ( '0', t ) ->
+            removeLeadingZeros t
+
+        _ ->
+            s

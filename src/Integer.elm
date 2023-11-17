@@ -1,10 +1,9 @@
 module Integer exposing
     ( Integer, maxSafeInt, minSafeInt
     , zero, one, two, three, four, five, six, seven, eight, nine, ten
-    , negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive
-    , negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
-    , fromInt, fromSafeInt
-    , toInt
+    , negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
+    , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
+    , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
 {-| Compute with the integers.
@@ -18,18 +17,17 @@ module Integer exposing
 # Constants
 
 @docs zero, one, two, three, four, five, six, seven, eight, nine, ten
-@docs negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive
-@docs negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
+@docs negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
 
 
 # Constructors
 
-@docs fromInt, fromSafeInt
+@docs fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
 
 
 # Conversion
 
-@docs toInt
+@docs toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
 
 -}
 
@@ -187,7 +185,106 @@ fromInt x =
 
 fromSafeInt : Int -> Integer
 fromSafeInt =
-    fromInt >> Maybe.withDefault zero
+    fromInt >> Maybe.withDefault Zero
+
+
+fromNatural : Natural -> Integer
+fromNatural n =
+    if N.isZero n then
+        Zero
+
+    else
+        Positive n
+
+
+fromBinaryString : String -> Maybe Integer
+fromBinaryString =
+    fromBaseBString 2
+
+
+fromOctalString : String -> Maybe Integer
+fromOctalString =
+    fromBaseBString 8
+
+
+fromDecimalString : String -> Maybe Integer
+fromDecimalString =
+    fromBaseBString 10
+
+
+fromHexString : String -> Maybe Integer
+fromHexString =
+    fromBaseBString 16
+
+
+fromString : String -> Maybe Integer
+fromString input =
+    String.uncons input
+        |> Maybe.andThen
+            (\( c, restInput ) ->
+                if c == '-' then
+                    N.fromString restInput
+                        |> Maybe.map
+                            (\n ->
+                                if N.isZero n then
+                                    Zero
+
+                                else
+                                    Negative n
+                            )
+
+                else
+                    N.fromString input
+                        |> Maybe.map
+                            (\n ->
+                                if N.isZero n then
+                                    Zero
+
+                                else
+                                    Positive n
+                            )
+            )
+
+
+fromSafeString : String -> Integer
+fromSafeString =
+    fromString >> Maybe.withDefault Zero
+
+
+fromBaseBString : Int -> String -> Maybe Integer
+fromBaseBString b input =
+    --
+    -- N.B. The input string must be of the format
+    --
+    --   input ::= -? baseBString"
+    --
+    -- For e.g. "123", "-123", "0", "-0", "-0b11", "-0xF".
+    --
+    String.uncons input
+        |> Maybe.andThen
+            (\( c, restInput ) ->
+                if c == '-' then
+                    N.fromBaseBString b restInput
+                        |> Maybe.map
+                            (\n ->
+                                if N.isZero n then
+                                    Zero
+
+                                else
+                                    Negative n
+                            )
+
+                else
+                    N.fromBaseBString b input
+                        |> Maybe.map
+                            (\n ->
+                                if N.isZero n then
+                                    Zero
+
+                                else
+                                    Positive n
+                            )
+            )
 
 
 
@@ -205,3 +302,63 @@ toInt z =
 
         Negative n ->
             -(N.toInt n)
+
+
+toNatural : Integer -> Maybe Natural
+toNatural z =
+    --
+    -- FIXME: I'm not too sure what to return in the negative case.
+    --
+    -- Should it be `toNatural : Integer -> Natural` instead?
+    -- In that case, do I return N.zero or n in the negative case?
+    --
+    -- Is this function even needed or necessary?
+    --
+    case z of
+        Zero ->
+            Just N.zero
+
+        Positive n ->
+            Just n
+
+        Negative _ ->
+            Nothing
+
+
+toBinaryString : Integer -> String
+toBinaryString =
+    toBaseBString 2 >> Maybe.withDefault ""
+
+
+toOctalString : Integer -> String
+toOctalString =
+    toBaseBString 8 >> Maybe.withDefault ""
+
+
+toDecimalString : Integer -> String
+toDecimalString =
+    toBaseBString 10 >> Maybe.withDefault ""
+
+
+toHexString : Integer -> String
+toHexString =
+    toBaseBString 16 >> Maybe.withDefault ""
+
+
+toString : Integer -> String
+toString =
+    toDecimalString
+
+
+toBaseBString : Int -> Integer -> Maybe String
+toBaseBString b z =
+    case z of
+        Zero ->
+            Just "0"
+
+        Positive n ->
+            N.toBaseBString b n
+
+        Negative n ->
+            N.toBaseBString b n
+                |> Maybe.map (String.cons '-')
