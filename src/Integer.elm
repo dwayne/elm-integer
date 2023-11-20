@@ -3,8 +3,9 @@ module Integer exposing
     , zero, one, two, three, four, five, six, seven, eight, nine, ten
     , negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
-    , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
+    , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
+    , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
 {-| Compute with the integers.
@@ -26,14 +27,19 @@ module Integer exposing
 @docs fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
 
 
-# Conversion
-
-@docs toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
-
-
 # Comparison
 
 @docs compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
+
+
+# Predicates
+
+@docs isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
+
+
+# Conversion
+
+@docs toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
 
 -}
 
@@ -380,6 +386,58 @@ min x y =
 
     else
         x
+
+
+
+-- PREDICATES
+
+
+isNegative : Integer -> Bool
+isNegative =
+    isLessThan zero
+
+
+isNonNegative : Integer -> Bool
+isNonNegative =
+    not << isNegative
+
+
+isZero : Integer -> Bool
+isZero =
+    (==) zero
+
+
+isNonZero : Integer -> Bool
+isNonZero =
+    not << isZero
+
+
+isPositive : Integer -> Bool
+isPositive =
+    isGreaterThan zero
+
+
+isNonPositive : Integer -> Bool
+isNonPositive =
+    not << isPositive
+
+
+isEven : Integer -> Bool
+isEven z =
+    case z of
+        Zero ->
+            True
+
+        Positive n ->
+            N.isEven n
+
+        Negative n ->
+            N.isEven n
+
+
+isOdd : Integer -> Bool
+isOdd =
+    not << isEven
 
 
 

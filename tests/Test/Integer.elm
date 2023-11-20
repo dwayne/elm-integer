@@ -13,6 +13,7 @@ suite =
         , constantsSuite
         , baseBStringConversionSuite
         , comparisonSuite
+        , predicatesSuite
         ]
 
 
@@ -167,6 +168,64 @@ comparisonSuite =
         ]
 
 
+predicatesSuite : Test
+predicatesSuite =
+    describe "predicates"
+        [ fuzz safeInt "isNegative / isNonNegative" <|
+            \a ->
+                let
+                    z =
+                        Z.fromSafeInt a
+                in
+                if a < 0 then
+                    Z.isNegative z
+                        |> Expect.equal True
+
+                else
+                    Z.isNonNegative z
+                        |> Expect.equal True
+        , fuzz safeInt "isZero / isNonZero" <|
+            \a ->
+                let
+                    z =
+                        Z.fromSafeInt a
+                in
+                if a == 0 then
+                    Z.isZero z
+                        |> Expect.equal True
+
+                else
+                    Z.isNonZero z
+                        |> Expect.equal True
+        , fuzz safeInt "isPositive / isNonPositive" <|
+            \a ->
+                let
+                    z =
+                        Z.fromSafeInt a
+                in
+                if a > 0 then
+                    Z.isPositive z
+                        |> Expect.equal True
+
+                else
+                    Z.isNonPositive z
+                        |> Expect.equal True
+        , fuzz safeInt "isEven / isOdd" <|
+            \a ->
+                let
+                    z =
+                        Z.fromSafeInt a
+                in
+                if isEven a then
+                    Z.isEven z
+                        |> Expect.equal True
+
+                else
+                    Z.isOdd z
+                        |> Expect.equal True
+        ]
+
+
 
 -- CUSTOM FUZZERS
 
@@ -289,3 +348,8 @@ removeLeadingZeros s =
 
         _ ->
             s
+
+
+isEven : Int -> Bool
+isEven =
+    modBy 2 >> (==) 0
