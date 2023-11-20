@@ -5,7 +5,7 @@ module Integer exposing
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
-    , abs, negate
+    , abs, negate, add, sub
     , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
@@ -40,7 +40,7 @@ module Integer exposing
 
 # Arithmetic
 
-@docs abs, negate
+@docs abs, negate, add, sub
 
 
 # Conversion
@@ -471,6 +471,76 @@ negate z =
 
         _ ->
             z
+
+
+add : Integer -> Integer -> Integer
+add x y =
+    case ( x, y ) of
+        ( _, Zero ) ->
+            --
+            -- x + 0 = x
+            --
+            x
+
+        ( Zero, _ ) ->
+            --
+            -- 0 + y = y
+            --
+            y
+
+        ( Negative a, Negative b ) ->
+            --
+            -- -5 + -4 = -(5+4)
+            --
+            Negative <| N.add a b
+
+        ( Negative a, Positive b ) ->
+            --
+            -- -5 + 4 = -(5 - 4) = -1
+            --
+            -- -5 + 5 = 0
+            --
+            -- -5 + 6 = 6 - 5 = 1
+            --
+            if a == b then
+                Zero
+
+            else if a |> N.isGreaterThan b then
+                Negative <| N.sub a b
+
+            else
+                Positive <| N.sub b a
+
+        ( Positive a, Negative b ) ->
+            --
+            -- 5 + (-4) = 5 - 4 = 1
+            --
+            -- 5 + (-5) = 0
+            --
+            -- 5 + (-6) = -(6 - 5) = -1
+            --
+            if a == b then
+                Zero
+
+            else if a |> N.isGreaterThan b then
+                Positive <| N.sub a b
+
+            else
+                Negative <| N.sub b a
+
+        ( Positive a, Positive b ) ->
+            --
+            -- 5 + 4 = 9
+            --
+            Positive <| N.add a b
+
+
+sub : Integer -> Integer -> Integer
+sub x y =
+    --
+    -- x - y = x + (-y)
+    --
+    add x <| negate y
 
 
 

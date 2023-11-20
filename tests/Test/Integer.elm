@@ -3,7 +3,7 @@ module Test.Integer exposing (suite)
 import Expect
 import Fuzz exposing (Fuzzer)
 import Integer as Z exposing (Integer)
-import Test exposing (Test, describe, fuzz, fuzz2, test)
+import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 
 
 suite : Test
@@ -16,6 +16,8 @@ suite =
         , predicatesSuite
         , absSuite
         , negateSuite
+        , additionSuite
+        , subtractionSuite
         ]
 
 
@@ -264,6 +266,76 @@ negateSuite =
             \z ->
                 Z.negate (Z.negate z)
                     |> Expect.equal z
+        ]
+
+
+additionSuite : Test
+additionSuite =
+    describe "add"
+        [ fuzz integer "∀ z ∊ ℤ, z + 0 = z" <|
+            --
+            -- Right identity.
+            --
+            \z ->
+                Z.add z Z.zero
+                    |> Expect.equal z
+        , fuzz integer "∀ z ∊ ℤ, 0 + z = z" <|
+            --
+            -- Left identity.
+            --
+            \z ->
+                Z.add Z.zero z
+                    |> Expect.equal z
+        , fuzz integer "∀ z ∊ ℤ, z + (-z) = 0" <|
+            --
+            -- Right inverse.
+            --
+            \z ->
+                Z.add z (Z.negate z)
+                    |> Expect.equal Z.zero
+        , fuzz integer "∀ z ∊ ℤ, (-z) + z = 0" <|
+            --
+            -- Left inverse.
+            --
+            \z ->
+                Z.add (Z.negate z) z
+                    |> Expect.equal Z.zero
+        , fuzz2 integer integer "∀ x, y ∊ ℤ, x + y = y + x" <|
+            --
+            -- Addition is commutative.
+            --
+            \x y ->
+                Z.add x y
+                    |> Expect.equal (Z.add y x)
+        , fuzz3 integer integer integer "∀ x, y, z ∊ ℤ, (x + y) + z = x + (y + z)" <|
+            --
+            -- Addition is associative.
+            --
+            \x y z ->
+                Z.add (Z.add x y) z
+                    |> Expect.equal (Z.add x (Z.add y z))
+        ]
+
+
+subtractionSuite : Test
+subtractionSuite =
+    describe "sub"
+        [ fuzz integer "∀ z ∊ ℤ, z - 0 = z" <|
+            \z ->
+                Z.sub z Z.zero
+                    |> Expect.equal z
+        , fuzz integer "∀ z ∊ ℤ, 0 - z = -z" <|
+            \z ->
+                Z.sub Z.zero z
+                    |> Expect.equal (Z.negate z)
+        , fuzz integer "∀ z ∊ ℤ, z - z = 0" <|
+            \z ->
+                Z.sub z z
+                    |> Expect.equal Z.zero
+        , fuzz2 integer integer "∀ x, y ∊ ℤ, x - y = -(y - x)" <|
+            \x y ->
+                Z.sub x y
+                    |> Expect.equal (Z.negate <| Z.sub y x)
         ]
 
 
