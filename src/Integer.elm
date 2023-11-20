@@ -5,7 +5,7 @@ module Integer exposing
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
-    , abs, negate, add, sub
+    , abs, negate, add, sub, mul
     , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
@@ -40,7 +40,7 @@ module Integer exposing
 
 # Arithmetic
 
-@docs abs, negate, add, sub
+@docs abs, negate, add, sub, mul
 
 
 # Conversion
@@ -541,6 +541,46 @@ sub x y =
     -- x - y = x + (-y)
     --
     add x <| negate y
+
+
+mul : Integer -> Integer -> Integer
+mul x y =
+    case ( x, y ) of
+        ( _, Zero ) ->
+            --
+            -- x * 0 = 0
+            --
+            Zero
+
+        ( Zero, _ ) ->
+            --
+            -- 0 * y = 0
+            --
+            Zero
+
+        ( Negative a, Negative b ) ->
+            --
+            -- -5 * -4 = 9
+            --
+            Positive <| N.mul a b
+
+        ( Negative a, Positive b ) ->
+            --
+            -- -5 * 4 = -9
+            --
+            Negative <| N.mul a b
+
+        ( Positive a, Negative b ) ->
+            --
+            -- 5 * -4 = -9
+            --
+            Negative <| N.mul a b
+
+        ( Positive a, Positive b ) ->
+            --
+            -- 5 * 4 = 9
+            --
+            Positive <| N.mul a b
 
 
 

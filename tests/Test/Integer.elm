@@ -18,6 +18,7 @@ suite =
         , negateSuite
         , additionSuite
         , subtractionSuite
+        , multiplicationSuite
         ]
 
 
@@ -336,6 +337,69 @@ subtractionSuite =
             \x y ->
                 Z.sub x y
                     |> Expect.equal (Z.negate <| Z.sub y x)
+        ]
+
+
+multiplicationSuite : Test
+multiplicationSuite =
+    describe "mul"
+        [ fuzz integer "∀ z ∊ ℤ, z * 0 = 0" <|
+            --
+            -- Multiplication by 0 on the right.
+            --
+            \z ->
+                Z.mul z Z.zero
+                    |> Expect.equal Z.zero
+        , fuzz integer "∀ z ∊ ℤ, 0 * z = 0" <|
+            --
+            -- Multiplication by 0 on the left.
+            --
+            \z ->
+                Z.mul Z.zero z
+                    |> Expect.equal Z.zero
+        , fuzz integer "∀ z ∊ ℤ, z * 1 = z" <|
+            --
+            -- Right identity.
+            --
+            \z ->
+                Z.mul z Z.one
+                    |> Expect.equal z
+        , fuzz integer "∀ z ∊ ℤ, 1 * z = z" <|
+            --
+            -- Left identity.
+            --
+            \z ->
+                Z.mul Z.one z
+                    |> Expect.equal z
+        , fuzz2 integer integer "∀ x, y ∊ ℤ, x * y = y * x" <|
+            --
+            -- Multiplication is commutative.
+            --
+            \x y ->
+                Z.mul x y
+                    |> Expect.equal (Z.mul y x)
+        , fuzz3 integer integer integer "∀ x, y, z ∊ ℤ, (x * y) * z = x * (y * z)" <|
+            --
+            -- Multiplication is associative.
+            --
+            \x y z ->
+                Z.mul (Z.mul x y) z
+                    |> Expect.equal (Z.mul x (Z.mul y z))
+        , fuzz3 integer integer integer "∀ x, y, z ∊ ℤ, x * (y + z) = x * y + x * z = y * x + z * x = (y + z) * x" <|
+            --
+            -- Multiplication distributes over addition.
+            --
+            \x y z ->
+                Z.mul x (Z.add y z)
+                    |> Expect.equal (Z.add (Z.mul x y) (Z.mul x z))
+        , fuzz integer "∀ z ∊ ℤ, -1 * z = -z" <|
+            \z ->
+                Z.mul Z.negativeOne z
+                    |> Expect.equal (Z.negate z)
+        , fuzz integer "∀ z ∊ ℤ, z * -1 = -z" <|
+            \z ->
+                Z.mul z Z.negativeOne
+                    |> Expect.equal (Z.negate z)
         ]
 
 
