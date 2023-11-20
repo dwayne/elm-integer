@@ -4,6 +4,7 @@ module Integer exposing
     , negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
     , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
+    , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     )
 
 {-| Compute with the integers.
@@ -28,6 +29,11 @@ module Integer exposing
 # Conversion
 
 @docs toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
+
+
+# Comparison
+
+@docs compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
 
 -}
 
@@ -285,6 +291,95 @@ fromBaseBString b input =
                                     Positive n
                             )
             )
+
+
+
+-- COMPARISON
+
+
+compare : Integer -> Integer -> Order
+compare x y =
+    case x of
+        Negative a ->
+            case y of
+                Negative b ->
+                    N.compare b a
+
+                _ ->
+                    LT
+
+        Zero ->
+            case y of
+                Negative _ ->
+                    GT
+
+                Zero ->
+                    EQ
+
+                _ ->
+                    LT
+
+        Positive a ->
+            case y of
+                Positive b ->
+                    N.compare a b
+
+                _ ->
+                    GT
+
+
+isLessThan : Integer -> Integer -> Bool
+isLessThan y x =
+    --
+    -- Is x < y?
+    --
+    compare x y == LT
+
+
+isLessThanOrEqual : Integer -> Integer -> Bool
+isLessThanOrEqual y x =
+    --
+    -- Is x <= y?
+    --
+    -- x <= y iff not (x > y)
+    --
+    not (x |> isGreaterThan y)
+
+
+isGreaterThan : Integer -> Integer -> Bool
+isGreaterThan y x =
+    --
+    -- Is x > y?
+    --
+    compare x y == GT
+
+
+isGreaterThanOrEqual : Integer -> Integer -> Bool
+isGreaterThanOrEqual y x =
+    --
+    -- Is x >= y?
+    --
+    -- x >= y iff not (x < y)
+    --
+    not (x |> isLessThan y)
+
+
+max : Integer -> Integer -> Integer
+max x y =
+    if x |> isLessThan y then
+        y
+
+    else
+        x
+
+
+min : Integer -> Integer -> Integer
+min x y =
+    if x |> isGreaterThan y then
+        y
+
+    else
+        x
 
 
 

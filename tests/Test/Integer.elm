@@ -2,8 +2,8 @@ module Test.Integer exposing (suite)
 
 import Expect
 import Fuzz exposing (Fuzzer)
-import Integer as Z
-import Test exposing (Test, describe, fuzz, test)
+import Integer as Z exposing (Integer)
+import Test exposing (Test, describe, fuzz, fuzz2, test)
 
 
 suite : Test
@@ -12,6 +12,7 @@ suite =
         [ intConversionSuite
         , constantsSuite
         , baseBStringConversionSuite
+        , comparisonSuite
         ]
 
 
@@ -137,8 +138,60 @@ baseBStringConversionSuite =
         ]
 
 
+comparisonSuite : Test
+comparisonSuite =
+    describe "compare"
+        [ fuzz2
+            safeInt
+            safeInt
+            "comparison as Int equals comparison as Integer"
+          <|
+            \a b ->
+                let
+                    x =
+                        Z.fromSafeInt a
+
+                    y =
+                        Z.fromSafeInt b
+                in
+                compare a b
+                    |> Expect.equal (Z.compare x y)
+        , fuzz integer "∀ z ∊ ℤ, z == z" <|
+            \z ->
+                Z.compare z z
+                    |> Expect.equal EQ
+
+        -- TODO:
+        -- 1. Add z < z + 1
+        -- 2. Add z - 1 < z
+        ]
+
+
 
 -- CUSTOM FUZZERS
+
+
+safeInt : Fuzzer Int
+safeInt =
+    Fuzz.intRange Z.minSafeInt Z.maxSafeInt
+
+
+integer : Fuzzer Integer
+integer =
+    baseBString
+        |> Fuzz.andThen
+            (\( b, s ) ->
+                case Z.fromBaseBString b s of
+                    Just z ->
+                        Fuzz.constant z
+
+                    Nothing ->
+                        --
+                        -- This should NEVER happen if both baseBString and
+                        -- Z.fromBaseBString are written correctly.
+                        --
+                        Fuzz.invalid <| "integer: an unexpected error"
+            )
 
 
 baseBString : Fuzzer ( Int, String )
