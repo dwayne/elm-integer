@@ -3,6 +3,7 @@ module Test.Integer exposing (suite)
 import Expect
 import Fuzz exposing (Fuzzer)
 import Integer as Z exposing (Integer)
+import Natural as N
 import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 
 
@@ -19,6 +20,7 @@ suite =
         , additionSuite
         , subtractionSuite
         , multiplicationSuite
+        , exponentiationSuite
         ]
 
 
@@ -400,6 +402,45 @@ multiplicationSuite =
             \z ->
                 Z.mul z Z.negativeOne
                     |> Expect.equal (Z.negate z)
+        ]
+
+
+exponentiationSuite : Test
+exponentiationSuite =
+    describe "exp"
+        [ fuzz integer "∀ z ∊ ℤ, z ^ 0 = 1" <|
+            \z ->
+                Z.exp z N.zero
+                    |> Expect.equal Z.one
+
+        --
+        -- TODO: Define positiveNatural.
+        --
+        --, fuzz positiveNatural "∀ n ∊ ℕ - {0}, 0 ^ n = 0" <|
+        --    \n ->
+        --        Z.exp Z.zero n
+        --            |> Expect.equal Z.zero
+        --
+        , fuzz integer "∀ z ∊ ℤ, z ^ 1 = z" <|
+            \z ->
+                Z.exp z N.one
+                    |> Expect.equal z
+        , fuzz integer "∀ z ∊ ℤ, z ^ 2 = z * z" <|
+            \z ->
+                Z.exp z N.two
+                    |> Expect.equal (Z.mul z z)
+        , fuzz integer "∀ z ∊ ℤ, z ^ 3 = z * z * z" <|
+            \z ->
+                Z.exp z N.three
+                    |> Expect.equal (Z.mul z <| Z.mul z z)
+
+        --
+        -- TODO: Define natural.
+        --
+        --, fuzz3 integer natural natural "∀ z ∊ ℤ, z ^ a * z ^ b = z ^ (a + b)" <|
+        --    \z a b ->
+        --        Z.mul (Z.exp z a) (Z.exp z b)
+        --            |> Expect.equal (Z.exp z <| Z.add a b)
         ]
 
 
