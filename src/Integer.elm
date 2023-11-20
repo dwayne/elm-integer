@@ -5,6 +5,7 @@ module Integer exposing
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
+    , abs, negate
     , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
@@ -35,6 +36,11 @@ module Integer exposing
 # Predicates
 
 @docs isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
+
+
+# Arithmetic
+
+@docs abs, negate
 
 
 # Conversion
@@ -438,6 +444,33 @@ isEven z =
 isOdd : Integer -> Bool
 isOdd =
     not << isEven
+
+
+
+-- ARITHMETIC
+
+
+abs : Integer -> Integer
+abs z =
+    case z of
+        Negative n ->
+            Positive n
+
+        _ ->
+            z
+
+
+negate : Integer -> Integer
+negate z =
+    case z of
+        Positive n ->
+            Negative n
+
+        Negative n ->
+            Positive n
+
+        _ ->
+            z
 
 
 

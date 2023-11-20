@@ -14,6 +14,8 @@ suite =
         , baseBStringConversionSuite
         , comparisonSuite
         , predicatesSuite
+        , absSuite
+        , negateSuite
         ]
 
 
@@ -145,7 +147,7 @@ comparisonSuite =
         [ fuzz2
             safeInt
             safeInt
-            "comparison as Int equals comparison as Integer"
+            "compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)"
           <|
             \a b ->
                 let
@@ -223,6 +225,45 @@ predicatesSuite =
                 else
                     Z.isOdd z
                         |> Expect.equal True
+        ]
+
+
+absSuite : Test
+absSuite =
+    describe "abs"
+        [ fuzz safeInt "|a| = Z.toInt |Z.fromSafeInt a|" <|
+            \a ->
+                let
+                    z =
+                        Z.fromSafeInt a
+                in
+                Z.abs z
+                    |> Z.toInt
+                    |> Expect.equal (abs a)
+        , fuzz integer "∀ z ∊ ℤ, |z| >= 0" <|
+            \z ->
+                Z.abs z
+                    |> Z.isNonNegative
+                    |> Expect.equal True
+        ]
+
+
+negateSuite : Test
+negateSuite =
+    describe "negate"
+        [ fuzz safeInt "-a == Z.toInt (Z.negate (Z.fromSafeInt a))" <|
+            \a ->
+                let
+                    z =
+                        Z.fromSafeInt a
+                in
+                Z.negate z
+                    |> Z.toInt
+                    |> Expect.equal -a
+        , fuzz integer "∀ z ∊ ℤ, -(-z) == z" <|
+            \z ->
+                Z.negate (Z.negate z)
+                    |> Expect.equal z
         ]
 
 
