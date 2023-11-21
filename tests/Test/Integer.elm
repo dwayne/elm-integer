@@ -20,6 +20,7 @@ suite =
         , additionSuite
         , subtractionSuite
         , multiplicationSuite
+        , euclideanDivisionSuite
         , exponentiationSuite
         ]
 
@@ -402,6 +403,59 @@ multiplicationSuite =
             \z ->
                 Z.mul z Z.negativeOne
                     |> Expect.equal (Z.negate z)
+        ]
+
+
+euclideanDivisionSuite : Test
+euclideanDivisionSuite =
+    describe "divModBy"
+        [ test "10 ÷ 2" <|
+            \_ ->
+                (Z.ten |> Z.divModBy Z.two)
+                    |> Expect.equal (Just ( Z.five, N.zero ))
+        , test "10 ÷ (-2)" <|
+            \_ ->
+                (Z.ten |> Z.divModBy Z.negativeTwo)
+                    |> Expect.equal (Just ( Z.negativeFive, N.zero ))
+        , test "(-10) ÷ 2" <|
+            \_ ->
+                (Z.negativeTen |> Z.divModBy Z.two)
+                    |> Expect.equal (Just ( Z.negativeFive, N.zero ))
+        , test "(-10) ÷ (-2)" <|
+            \_ ->
+                (Z.negativeTen |> Z.divModBy Z.negativeTwo)
+                    |> Expect.equal (Just ( Z.five, N.zero ))
+        , test "10 ÷ 3" <|
+            \_ ->
+                (Z.ten |> Z.divModBy Z.three)
+                    |> Expect.equal (Just ( Z.three, N.one ))
+        , test "10 ÷ (-3)" <|
+            \_ ->
+                (Z.ten |> Z.divModBy Z.negativeThree)
+                    |> Expect.equal (Just ( Z.negativeThree, N.one ))
+        , test "(-10) ÷ 3" <|
+            \_ ->
+                (Z.negativeTen |> Z.divModBy Z.three)
+                    |> Expect.equal (Just ( Z.negativeFour, N.two ))
+        , test "(-10) ÷ (-3)" <|
+            \_ ->
+                (Z.negativeTen |> Z.divModBy Z.negativeThree)
+                    |> Expect.equal (Just ( Z.four, N.two ))
+        , fuzz2 integer integer "∀ D ∊ ℤ, d ∊ ℤ - {0}, D = d * q + r where q ∊ ℤ and 0 ≤ r < |d|" <|
+            \bigD d ->
+                case bigD |> Z.divModBy d of
+                    Just ( q, r ) ->
+                        ( bigD
+                        , r |> N.isLessThan (Z.toNatural d)
+                        )
+                            |> Expect.equal
+                                ( Z.add (Z.mul d q) (Z.fromNatural r)
+                                , True
+                                )
+
+                    Nothing ->
+                        Z.isZero d
+                            |> Expect.equal True
         ]
 
 

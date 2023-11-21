@@ -5,7 +5,7 @@ module Integer exposing
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
-    , abs, negate, add, sub, mul, exp
+    , abs, negate, add, sub, mul, divModBy, divBy, modBy, exp
     , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
@@ -40,7 +40,7 @@ module Integer exposing
 
 # Arithmetic
 
-@docs abs, negate, add, sub, mul, exp
+@docs abs, negate, add, sub, mul, divModBy, divBy, modBy, exp
 
 
 # Conversion
@@ -583,6 +583,97 @@ mul x y =
             Positive <| N.mul a b
 
 
+divModBy : Integer -> Integer -> Maybe ( Integer, Natural )
+divModBy divisor dividend =
+    case ( divisor, dividend ) of
+        ( Zero, _ ) ->
+            --
+            -- Division by 0 is undefined.
+            --
+            Nothing
+
+        ( _, Zero ) ->
+            --
+            -- Anything divided by 0 is 0.
+            --
+            Just ( zero, N.zero )
+
+        ( Positive b, Positive a ) ->
+            --
+            -- 10 = 2 * 5 + 0
+            --
+            -- 10 = 3 * 3 + 1
+            --
+            N.divModBy b a
+                |> Maybe.map (Tuple.mapFirst fromNatural)
+
+        ( Negative b, Positive a ) ->
+            --
+            -- 10 = -2 * -5 + 0
+            --
+            -- 10 = -3 * -3 + 1
+            --
+            N.divModBy b a
+                |> Maybe.map (Tuple.mapFirst <| negate << fromNatural)
+
+        ( Positive b, Negative a ) ->
+            --
+            -- -10 = 2 * -5 + 0
+            --
+            -- -10 = 3 * -4 + 2
+            --
+            N.divModBy b a
+                |> Maybe.map
+                    (\( q, r ) ->
+                        if N.isZero r then
+                            ( q
+                                |> fromNatural
+                                |> negate
+                            , r
+                            )
+
+                        else
+                            ( q
+                                |> N.add N.one
+                                |> fromNatural
+                                |> negate
+                            , N.sub b r
+                            )
+                    )
+
+        ( Negative b, Negative a ) ->
+            --
+            -- -10 = -2 * 5 + 0
+            --
+            -- -10 = -3 * 4 + 2
+            --
+            N.divModBy b a
+                |> Maybe.map
+                    (\( q, r ) ->
+                        if N.isZero r then
+                            ( fromNatural q, r )
+
+                        else
+                            ( q
+                                |> N.add N.one
+                                |> fromNatural
+                            , N.sub b r
+                            )
+                    )
+
+
+divBy : Integer -> Integer -> Maybe Integer
+divBy divisor dividend =
+    divModBy divisor dividend
+        |> Maybe.map Tuple.first
+
+
+modBy : Integer -> Integer -> Maybe Natural
+modBy divisor dividend =
+    divModBy divisor dividend
+        |> Maybe.map Tuple.second
+
+
 exp : Integer -> Natural -> Integer
 exp x n =
     case x of
@@ -627,25 +718,20 @@ toInt z =
             -(N.toInt n)
 
 
-toNatural : Integer -> Maybe Natural
+toNatural : Integer -> Natural
 toNatural z =
     --
-    -- FIXME: I'm not too sure what to return in the negative case.
-    --
-    -- Should it be `toNatural : Integer -> Natural` instead?
-    -- In that case, do I return N.zero or n in the negative case?
-    --
-    -- Is this function even needed or necessary?
+    -- It returns the absolute value of z as a Natural.
     --
     case z of
         Zero ->
-            Just N.zero
+            N.zero
 
         Positive n ->
-            Just n
+            n
 
-        Negative _ ->
-            Nothing
+        Negative n ->
+            n
 
 
 toBinaryString : Integer -> String
