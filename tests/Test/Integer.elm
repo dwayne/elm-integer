@@ -3,7 +3,7 @@ module Test.Integer exposing (suite)
 import Expect
 import Fuzz exposing (Fuzzer)
 import Integer as Z exposing (Integer)
-import Natural as N
+import Natural as N exposing (Natural)
 import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 
 
@@ -412,15 +412,10 @@ exponentiationSuite =
             \z ->
                 Z.exp z N.zero
                     |> Expect.equal Z.one
-
-        --
-        -- TODO: Define positiveNatural.
-        --
-        --, fuzz positiveNatural "∀ n ∊ ℕ - {0}, 0 ^ n = 0" <|
-        --    \n ->
-        --        Z.exp Z.zero n
-        --            |> Expect.equal Z.zero
-        --
+        , fuzz nonZeroExponent "∀ n ∊ ℕ - {0}, 0 ^ n = 0" <|
+            \n ->
+                Z.exp Z.zero n
+                    |> Expect.equal Z.zero
         , fuzz integer "∀ z ∊ ℤ, z ^ 1 = z" <|
             \z ->
                 Z.exp z N.one
@@ -433,14 +428,10 @@ exponentiationSuite =
             \z ->
                 Z.exp z N.three
                     |> Expect.equal (Z.mul z <| Z.mul z z)
-
-        --
-        -- TODO: Define natural.
-        --
-        --, fuzz3 integer natural natural "∀ z ∊ ℤ, z ^ a * z ^ b = z ^ (a + b)" <|
-        --    \z a b ->
-        --        Z.mul (Z.exp z a) (Z.exp z b)
-        --            |> Expect.equal (Z.exp z <| Z.add a b)
+        , fuzz3 integer exponent exponent "∀ z ∊ ℤ, z ^ a * z ^ b = z ^ (a + b)" <|
+            \z a b ->
+                Z.mul (Z.exp z a) (Z.exp z b)
+                    |> Expect.equal (Z.exp z <| N.add a b)
         ]
 
 
@@ -451,6 +442,18 @@ exponentiationSuite =
 safeInt : Fuzzer Int
 safeInt =
     Fuzz.intRange Z.minSafeInt Z.maxSafeInt
+
+
+nonZeroExponent : Fuzzer Natural
+nonZeroExponent =
+    exponent
+        |> Fuzz.map (N.add N.one)
+
+
+exponent : Fuzzer Natural
+exponent =
+    Fuzz.uniformInt 25
+        |> Fuzz.andThen (Fuzz.constant << N.fromSafeInt)
 
 
 integer : Fuzzer Integer
