@@ -28,6 +28,8 @@ The integers from `-10` to `10` inclusive are named.
 
 # Limits
 
+Let `n : Int`. If `minSafeInt <= n && n <= maxSafeInt` then `n` is called a **safe `Int`**.
+
 @docs maxSafeInt, minSafeInt
 
 
@@ -274,10 +276,28 @@ minSafeInt =
 -- CONSTRUCTORS
 
 
-{-| -}
+{-| Create the integer that represents the given `Int`.
+
+    fromInt 0 == Just zero
+
+    fromInt 1 == Just one
+
+    fromInt -1 == Just negativeOne
+
+    fromInt maxSafeInt == fromString "9007199254740991"
+
+    fromInt minSafeInt == fromString "-9007199254740991"
+
+Unless the given `Int` is less than [`minSafeInt`](#minSafeInt) or greater than [`maxSafeInt`](#maxSafeInt).
+
+    fromInt (minSafeInt - 1) == Nothing
+
+    fromInt (maxSafeInt + 1) == Nothing
+
+-}
 fromInt : Int -> Maybe Integer
 fromInt x =
-    if x >= minSafeInt && x <= maxSafeInt then
+    if minSafeInt <= x && x <= maxSafeInt then
         if x == 0 then
             Just Zero
 
@@ -291,13 +311,46 @@ fromInt x =
         Nothing
 
 
-{-| -}
+{-| Use this function when you know the given `Int` is a [safe `Int`](#limits).
+
+    fromSafeInt 0 == zero
+
+    fromSafeInt 1 == one
+
+    fromSafeInt -1 == negativeOne
+
+    fromSafeInt maxSafeInt == fromSafeString "9007199254740991"
+
+    fromSafeInt minSafeInt == fromSafeString "-9007199254740991"
+
+If the given `Int` isn't safe then [`zero`](#zero) is returned.
+
+    fromSafeInt (minSafeInt - 1) == zero
+
+    fromSafeInt (maxSafeInt + 1) == zero
+
+This function is useful for establishing **small constants** in a calculation. For e.g.
+to [compute the first 100 digits of π using John Machin's formula](https://en.wikipedia.org/wiki/Machin-like_formula)
+the integer 239 is needed.
+
+    twoThirtyNine : Integer
+    twoThirtyNine =
+        fromSafeInt 239
+
+-}
 fromSafeInt : Int -> Integer
 fromSafeInt =
     fromInt >> Maybe.withDefault Zero
 
 
-{-| -}
+{-| If you happen to have a natural number at hand then you can convert it to an integer using this function.
+
+For all `n : Natural`:
+
+  - `toNatural (fromNatural n) == n`,
+  - `isNonNegative (fromNatural n) == True`.
+
+-}
 fromNatural : Natural -> Integer
 fromNatural n =
     if N.isZero n then

@@ -10,8 +10,11 @@ import Test exposing (Test, describe, fuzz, fuzz2, fuzz3, test)
 suite : Test
 suite =
     describe "Integer"
-        [ intConversionSuite
-        , constantsSuite
+        [ constantsSuite
+        , fromIntSuite
+        , fromSafeIntSuite
+        , fromNaturalSuite
+        , intConversionSuite
         , baseBStringConversionSuite
         , comparisonSuite
         , predicatesSuite
@@ -22,27 +25,6 @@ suite =
         , multiplicationSuite
         , euclideanDivisionSuite
         , exponentiationSuite
-        ]
-
-
-intConversionSuite : Test
-intConversionSuite =
-    describe "fromInt / toInt conversion"
-        [ fuzz Fuzz.int "small integers" <|
-            \z ->
-                Z.fromInt z
-                    |> Maybe.map Z.toInt
-                    |> Expect.equal (Just z)
-        , test "maxSafeInt" <|
-            \_ ->
-                Z.fromInt Z.maxSafeInt
-                    |> Maybe.map Z.toInt
-                    |> Expect.equal (Just Z.maxSafeInt)
-        , test "minSafeInt" <|
-            \_ ->
-                Z.fromInt Z.minSafeInt
-                    |> Maybe.map Z.toInt
-                    |> Expect.equal (Just Z.minSafeInt)
         ]
 
 
@@ -133,6 +115,109 @@ constantsSuite =
             \_ ->
                 Z.negativeTen
                     |> Expect.equal (Z.fromSafeInt -10)
+        ]
+
+
+fromIntSuite : Test
+fromIntSuite =
+    describe "fromInt"
+        [ test "0" <|
+            \_ ->
+                Z.fromInt 0
+                    |> Expect.equal (Just Z.zero)
+        , test "1" <|
+            \_ ->
+                Z.fromInt 1
+                    |> Expect.equal (Just Z.one)
+        , test "-1" <|
+            \_ ->
+                Z.fromInt -1
+                    |> Expect.equal (Just Z.negativeOne)
+        , test "maxSafeInt" <|
+            \_ ->
+                Z.fromInt Z.maxSafeInt
+                    |> Expect.equal (Z.fromString "9007199254740991")
+        , test "minSafeInt" <|
+            \_ ->
+                Z.fromInt Z.minSafeInt
+                    |> Expect.equal (Z.fromString "-9007199254740991")
+        , test "minSafeInt - 1" <|
+            \_ ->
+                Z.fromInt (Z.minSafeInt - 1)
+                    |> Expect.equal Nothing
+        , test "maxSafeInt + 1" <|
+            \_ ->
+                Z.fromInt (Z.maxSafeInt + 1)
+                    |> Expect.equal Nothing
+        ]
+
+
+fromSafeIntSuite : Test
+fromSafeIntSuite =
+    describe "fromSafeInt"
+        [ test "0" <|
+            \_ ->
+                Z.fromSafeInt 0
+                    |> Expect.equal Z.zero
+        , test "1" <|
+            \_ ->
+                Z.fromSafeInt 1
+                    |> Expect.equal Z.one
+        , test "-1" <|
+            \_ ->
+                Z.fromSafeInt -1
+                    |> Expect.equal Z.negativeOne
+        , test "maxSafeInt" <|
+            \_ ->
+                Z.fromSafeInt Z.maxSafeInt
+                    |> Expect.equal (Z.fromSafeString "9007199254740991")
+        , test "minSafeInt" <|
+            \_ ->
+                Z.fromSafeInt Z.minSafeInt
+                    |> Expect.equal (Z.fromSafeString "-9007199254740991")
+        , test "minSafeInt - 1" <|
+            \_ ->
+                Z.fromSafeInt (Z.minSafeInt - 1)
+                    |> Expect.equal Z.zero
+        , test "maxSafeInt + 1" <|
+            \_ ->
+                Z.fromSafeInt (Z.maxSafeInt + 1)
+                    |> Expect.equal Z.zero
+        ]
+
+
+fromNaturalSuite : Test
+fromNaturalSuite =
+    describe "fromNatural"
+        [ fuzz natural "∀ n ∊ ℕ, toNatural (fromNatural n) == n" <|
+            \n ->
+                Z.toNatural (Z.fromNatural n)
+                    |> Expect.equal n
+        , fuzz natural "∀ n ∊ ℕ, isNonNegative (fromNatural n) == True" <|
+            \n ->
+                Z.isNonNegative (Z.fromNatural n)
+                    |> Expect.equal True
+        ]
+
+
+intConversionSuite : Test
+intConversionSuite =
+    describe "fromInt / toInt conversion"
+        [ fuzz Fuzz.int "small integers" <|
+            \z ->
+                Z.fromInt z
+                    |> Maybe.map Z.toInt
+                    |> Expect.equal (Just z)
+        , test "maxSafeInt" <|
+            \_ ->
+                Z.fromInt Z.maxSafeInt
+                    |> Maybe.map Z.toInt
+                    |> Expect.equal (Just Z.maxSafeInt)
+        , test "minSafeInt" <|
+            \_ ->
+                Z.fromInt Z.minSafeInt
+                    |> Maybe.map Z.toInt
+                    |> Expect.equal (Just Z.minSafeInt)
         ]
 
 
@@ -498,16 +583,22 @@ safeInt =
     Fuzz.intRange Z.minSafeInt Z.maxSafeInt
 
 
-nonZeroExponent : Fuzzer Natural
-nonZeroExponent =
-    exponent
-        |> Fuzz.map (N.add N.one)
+natural : Fuzzer Natural
+natural =
+    Fuzz.intRange 0 N.maxSafeInt
+        |> Fuzz.andThen (Fuzz.constant << N.fromSafeInt)
 
 
 exponent : Fuzzer Natural
 exponent =
     Fuzz.uniformInt 25
         |> Fuzz.andThen (Fuzz.constant << N.fromSafeInt)
+
+
+nonZeroExponent : Fuzzer Natural
+nonZeroExponent =
+    exponent
+        |> Fuzz.map (N.add N.one)
 
 
 integer : Fuzzer Integer
