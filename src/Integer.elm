@@ -1,7 +1,8 @@
 module Integer exposing
-    ( Integer, maxSafeInt, minSafeInt
+    ( Integer
     , zero, one, two, three, four, five, six, seven, eight, nine, ten
     , negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
+    , maxSafeInt, minSafeInt
     , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
@@ -9,18 +10,25 @@ module Integer exposing
     , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
     )
 
-{-| Compute with the integers.
+{-| Compute with the [integers](https://en.wikipedia.org/wiki/Integer), ℤ = { ..., -2, -1, 0, 1, 2, ... }.
 
 
 # Representation
 
-@docs Integer, maxSafeInt, minSafeInt
+@docs Integer
 
 
 # Constants
 
+The integers from `-10` to `10` inclusive are named.
+
 @docs zero, one, two, three, four, five, six, seven, eight, nine, ten
 @docs negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
+
+
+# Limits
+
+@docs maxSafeInt, minSafeInt
 
 
 # Constructors
@@ -29,6 +37,14 @@ module Integer exposing
 
 
 # Comparison
+
+To test for equality between two integers you can use `==` and `/=`.
+
+    add negativeFive two == negativeThree
+
+    mul negativeThree negativeThree /= negativeNine
+
+For all other comparisons you will have to use the functions below.
 
 @docs compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
 
@@ -56,19 +72,25 @@ import Natural as N exposing (Natural)
 -- REPRESENTATION
 
 
-maxSafeInt : Int
-maxSafeInt =
-    N.maxSafeInt
+{-| A representation of the integers.
 
+If you must know, it uses a **sign-magnitude** representation.
 
-minSafeInt : Int
-minSafeInt =
-    -maxSafeInt
+**N.B.** _The size of the numbers you can compute with is only limited by the available memory._
 
-
-type Integer
+-}
+type
+    Integer
+    --
+    -- There is only one representation of 0. `Positive N.zero` and `Negative N.zero` are
+    -- illegal representations that are NEVER produced by any of the functions exported by
+    -- this library.
+    --
+    -- 0
     = Zero
+      -- 1, 2, 3, 4, 5, ...
     | Positive Natural
+      -- -1, -2, -3, -4, -5, ...
     | Negative Natural
 
 
@@ -76,115 +98,183 @@ type Integer
 -- CONSTANTS
 
 
+{-| The integer [`0`](https://en.wikipedia.org/wiki/0).
+
+To be more precise, it is a representation of the integer `0`. However, I will not
+have any cause to make that distinction. A similar remark can be made about the
+other constants.
+
+-}
 zero : Integer
 zero =
     Zero
 
 
+{-| The integer [`1`](https://en.wikipedia.org/wiki/1).
+-}
 one : Integer
 one =
     Positive N.one
 
 
+{-| The integer [`2`](https://en.wikipedia.org/wiki/2).
+-}
 two : Integer
 two =
     Positive N.two
 
 
+{-| The integer [`3`](https://en.wikipedia.org/wiki/3).
+-}
 three : Integer
 three =
     Positive N.three
 
 
+{-| The integer [`4`](https://en.wikipedia.org/wiki/4).
+-}
 four : Integer
 four =
     Positive N.four
 
 
+{-| The integer [`5`](https://en.wikipedia.org/wiki/5).
+-}
 five : Integer
 five =
     Positive N.five
 
 
+{-| The integer [`6`](https://en.wikipedia.org/wiki/6).
+-}
 six : Integer
 six =
     Positive N.six
 
 
+{-| The integer [`7`](https://en.wikipedia.org/wiki/7).
+-}
 seven : Integer
 seven =
     Positive N.seven
 
 
+{-| The integer [`8`](https://en.wikipedia.org/wiki/8).
+-}
 eight : Integer
 eight =
     Positive N.eight
 
 
+{-| The integer [`9`](https://en.wikipedia.org/wiki/9).
+-}
 nine : Integer
 nine =
     Positive N.nine
 
 
+{-| The integer [`10`](https://en.wikipedia.org/wiki/10).
+-}
 ten : Integer
 ten =
     Positive N.ten
 
 
+{-| The integer [`-1`](https://en.wikipedia.org/wiki/-1).
+-}
 negativeOne : Integer
 negativeOne =
     Negative N.one
 
 
+{-| The integer `-2`.
+-}
 negativeTwo : Integer
 negativeTwo =
     Negative N.two
 
 
+{-| The integer `-3`.
+-}
 negativeThree : Integer
 negativeThree =
     Negative N.three
 
 
+{-| The integer `-4`.
+-}
 negativeFour : Integer
 negativeFour =
     Negative N.four
 
 
+{-| The integer `-5`.
+-}
 negativeFive : Integer
 negativeFive =
     Negative N.five
 
 
+{-| The integer `-6`.
+-}
 negativeSix : Integer
 negativeSix =
     Negative N.six
 
 
+{-| The integer `-7`.
+-}
 negativeSeven : Integer
 negativeSeven =
     Negative N.seven
 
 
+{-| The integer `-8`.
+-}
 negativeEight : Integer
 negativeEight =
     Negative N.eight
 
 
+{-| The integer `-9`.
+-}
 negativeNine : Integer
 negativeNine =
     Negative N.nine
 
 
+{-| The integer `-10`.
+-}
 negativeTen : Integer
 negativeTen =
     Negative N.ten
 
 
 
+-- LIMITS
+
+
+{-| The largest `Int`, currently `2^53 - 1 = 9007199254740991`, which can be given as input to
+[`fromInt`](#fromInt) and [`fromSafeInt`](#fromSafeInt) without causing problems.
+-}
+maxSafeInt : Int
+maxSafeInt =
+    N.maxSafeInt
+
+
+{-| The smallest `Int`, currently `-2^53 + 1 = -9007199254740991`, which can be given as input to
+[`fromInt`](#fromInt) and [`fromSafeInt`](#fromSafeInt) without causing problems.
+-}
+minSafeInt : Int
+minSafeInt =
+    -maxSafeInt
+
+
+
 -- CONSTRUCTORS
 
 
+{-| -}
 fromInt : Int -> Maybe Integer
 fromInt x =
     if x >= minSafeInt && x <= maxSafeInt then
@@ -201,11 +291,13 @@ fromInt x =
         Nothing
 
 
+{-| -}
 fromSafeInt : Int -> Integer
 fromSafeInt =
     fromInt >> Maybe.withDefault Zero
 
 
+{-| -}
 fromNatural : Natural -> Integer
 fromNatural n =
     if N.isZero n then
@@ -215,26 +307,31 @@ fromNatural n =
         Positive n
 
 
+{-| -}
 fromBinaryString : String -> Maybe Integer
 fromBinaryString =
     fromBaseBString 2
 
 
+{-| -}
 fromOctalString : String -> Maybe Integer
 fromOctalString =
     fromBaseBString 8
 
 
+{-| -}
 fromDecimalString : String -> Maybe Integer
 fromDecimalString =
     fromBaseBString 10
 
 
+{-| -}
 fromHexString : String -> Maybe Integer
 fromHexString =
     fromBaseBString 16
 
 
+{-| -}
 fromString : String -> Maybe Integer
 fromString input =
     String.uncons input
@@ -264,11 +361,13 @@ fromString input =
             )
 
 
+{-| -}
 fromSafeString : String -> Integer
 fromSafeString =
     fromString >> Maybe.withDefault Zero
 
 
+{-| -}
 fromBaseBString : Int -> String -> Maybe Integer
 fromBaseBString b input =
     --
@@ -309,6 +408,7 @@ fromBaseBString b input =
 -- COMPARISON
 
 
+{-| -}
 compare : Integer -> Integer -> Order
 compare x y =
     case x of
@@ -340,6 +440,7 @@ compare x y =
                     GT
 
 
+{-| -}
 isLessThan : Integer -> Integer -> Bool
 isLessThan y x =
     --
@@ -348,6 +449,7 @@ isLessThan y x =
     compare x y == LT
 
 
+{-| -}
 isLessThanOrEqual : Integer -> Integer -> Bool
 isLessThanOrEqual y x =
     --
@@ -358,6 +460,7 @@ isLessThanOrEqual y x =
     not (x |> isGreaterThan y)
 
 
+{-| -}
 isGreaterThan : Integer -> Integer -> Bool
 isGreaterThan y x =
     --
@@ -366,6 +469,7 @@ isGreaterThan y x =
     compare x y == GT
 
 
+{-| -}
 isGreaterThanOrEqual : Integer -> Integer -> Bool
 isGreaterThanOrEqual y x =
     --
@@ -376,6 +480,7 @@ isGreaterThanOrEqual y x =
     not (x |> isLessThan y)
 
 
+{-| -}
 max : Integer -> Integer -> Integer
 max x y =
     if x |> isLessThan y then
@@ -385,6 +490,7 @@ max x y =
         x
 
 
+{-| -}
 min : Integer -> Integer -> Integer
 min x y =
     if x |> isGreaterThan y then
@@ -398,36 +504,43 @@ min x y =
 -- PREDICATES
 
 
+{-| -}
 isNegative : Integer -> Bool
 isNegative =
     isLessThan zero
 
 
+{-| -}
 isNonNegative : Integer -> Bool
 isNonNegative =
     not << isNegative
 
 
+{-| -}
 isZero : Integer -> Bool
 isZero =
     (==) zero
 
 
+{-| -}
 isNonZero : Integer -> Bool
 isNonZero =
     not << isZero
 
 
+{-| -}
 isPositive : Integer -> Bool
 isPositive =
     isGreaterThan zero
 
 
+{-| -}
 isNonPositive : Integer -> Bool
 isNonPositive =
     not << isPositive
 
 
+{-| -}
 isEven : Integer -> Bool
 isEven z =
     case z of
@@ -441,6 +554,7 @@ isEven z =
             N.isEven n
 
 
+{-| -}
 isOdd : Integer -> Bool
 isOdd =
     not << isEven
@@ -450,6 +564,7 @@ isOdd =
 -- ARITHMETIC
 
 
+{-| -}
 abs : Integer -> Integer
 abs z =
     case z of
@@ -460,6 +575,7 @@ abs z =
             z
 
 
+{-| -}
 negate : Integer -> Integer
 negate z =
     case z of
@@ -473,6 +589,7 @@ negate z =
             z
 
 
+{-| -}
 add : Integer -> Integer -> Integer
 add x y =
     case ( x, y ) of
@@ -535,6 +652,7 @@ add x y =
             Positive <| N.add a b
 
 
+{-| -}
 sub : Integer -> Integer -> Integer
 sub x y =
     --
@@ -543,6 +661,7 @@ sub x y =
     add x <| negate y
 
 
+{-| -}
 mul : Integer -> Integer -> Integer
 mul x y =
     case ( x, y ) of
@@ -583,6 +702,7 @@ mul x y =
             Positive <| N.mul a b
 
 
+{-| -}
 divModBy : Integer -> Integer -> Maybe ( Integer, Natural )
 divModBy divisor dividend =
     case ( divisor, dividend ) of
@@ -662,18 +782,21 @@ divModBy divisor dividend =
                     )
 
 
+{-| -}
 divBy : Integer -> Integer -> Maybe Integer
 divBy divisor dividend =
     divModBy divisor dividend
         |> Maybe.map Tuple.first
 
 
+{-| -}
 modBy : Integer -> Integer -> Maybe Natural
 modBy divisor dividend =
     divModBy divisor dividend
         |> Maybe.map Tuple.second
 
 
+{-| -}
 exp : Integer -> Natural -> Integer
 exp x n =
     case x of
@@ -705,6 +828,7 @@ exp x n =
 -- CONVERSION
 
 
+{-| -}
 toInt : Integer -> Int
 toInt z =
     case z of
@@ -718,6 +842,7 @@ toInt z =
             -(N.toInt n)
 
 
+{-| -}
 toNatural : Integer -> Natural
 toNatural z =
     --
@@ -734,31 +859,37 @@ toNatural z =
             n
 
 
+{-| -}
 toBinaryString : Integer -> String
 toBinaryString =
     toBaseBString 2 >> Maybe.withDefault ""
 
 
+{-| -}
 toOctalString : Integer -> String
 toOctalString =
     toBaseBString 8 >> Maybe.withDefault ""
 
 
+{-| -}
 toDecimalString : Integer -> String
 toDecimalString =
     toBaseBString 10 >> Maybe.withDefault ""
 
 
+{-| -}
 toHexString : Integer -> String
 toHexString =
     toBaseBString 16 >> Maybe.withDefault ""
 
 
+{-| -}
 toString : Integer -> String
 toString =
     toDecimalString
 
 
+{-| -}
 toBaseBString : Int -> Integer -> Maybe String
 toBaseBString b z =
     case z of
