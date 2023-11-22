@@ -14,8 +14,8 @@ suite =
         , fromIntSuite
         , fromSafeIntSuite
         , fromNaturalSuite
-        , intConversionSuite
-        , baseBStringConversionSuite
+        , fromBaseBStringSuite
+        , fromStringSuite
         , comparisonSuite
         , predicatesSuite
         , absSuite
@@ -149,6 +149,23 @@ fromIntSuite =
             \_ ->
                 Z.fromInt (Z.maxSafeInt + 1)
                     |> Expect.equal Nothing
+        , describe "for all safe integers z, toInt (fromInt z) == z"
+            [ test "maxSafeInt" <|
+                \_ ->
+                    Z.fromInt Z.maxSafeInt
+                        |> Maybe.map Z.toInt
+                        |> Expect.equal (Just Z.maxSafeInt)
+            , test "minSafeInt" <|
+                \_ ->
+                    Z.fromInt Z.minSafeInt
+                        |> Maybe.map Z.toInt
+                        |> Expect.equal (Just Z.minSafeInt)
+            , fuzz safeInt "safe integers" <|
+                \z ->
+                    Z.fromInt z
+                        |> Maybe.map Z.toInt
+                        |> Expect.equal (Just z)
+            ]
         ]
 
 
@@ -200,35 +217,76 @@ fromNaturalSuite =
         ]
 
 
-intConversionSuite : Test
-intConversionSuite =
-    describe "fromInt / toInt conversion"
-        [ fuzz Fuzz.int "small integers" <|
-            \z ->
-                Z.fromInt z
-                    |> Maybe.map Z.toInt
-                    |> Expect.equal (Just z)
-        , test "maxSafeInt" <|
+fromBaseBStringSuite : Test
+fromBaseBStringSuite =
+    describe "fromBaseBString"
+        [ test "b=2 1010" <|
             \_ ->
-                Z.fromInt Z.maxSafeInt
-                    |> Maybe.map Z.toInt
-                    |> Expect.equal (Just Z.maxSafeInt)
-        , test "minSafeInt" <|
+                Z.fromBaseBString 2 "1010"
+                    |> Expect.equal (Just Z.ten)
+        , test "b=2 -1010" <|
             \_ ->
-                Z.fromInt Z.minSafeInt
-                    |> Maybe.map Z.toInt
-                    |> Expect.equal (Just Z.minSafeInt)
-        ]
-
-
-baseBStringConversionSuite : Test
-baseBStringConversionSuite =
-    describe "fromBaseBString / toBaseBString conversion"
-        [ fuzz baseBString "base b string" <|
+                Z.fromBaseBString 2 "-1010"
+                    |> Expect.equal (Just Z.negativeTen)
+        , test "b=16 aD" <|
+            \_ ->
+                Z.fromBaseBString 16 "aD"
+                    |> Expect.equal (Z.fromInt 173)
+        , test "b=36 z" <|
+            \_ ->
+                Z.fromBaseBString 36 "z"
+                    |> Expect.equal (Z.fromInt 35)
+        , test "b=2 empty" <|
+            \_ ->
+                Z.fromBaseBString 2 ""
+                    |> Expect.equal Nothing
+        , test "b=8 -" <|
+            \_ ->
+                Z.fromBaseBString 8 "-"
+                    |> Expect.equal Nothing
+        , test "b=10 A" <|
+            \_ ->
+                Z.fromBaseBString 10 "A"
+                    |> Expect.equal Nothing
+        , fuzz baseBString "base-b string" <|
             \( b, s ) ->
                 Z.fromBaseBString b s
                     |> Maybe.andThen (Z.toBaseBString b)
                     |> Expect.equal (Just <| toCanonicalBaseBString s)
+        ]
+
+
+fromStringSuite : Test
+fromStringSuite =
+    describe "fromString"
+        [ test "0b10101101" <|
+            \_ ->
+                Z.fromString "0b10101101"
+                    |> Expect.equal (Z.fromInt 173)
+        , test "-0o255" <|
+            \_ ->
+                Z.fromString "-0o255"
+                    |> Expect.equal (Z.fromInt -173)
+        , test "0XaD" <|
+            \_ ->
+                Z.fromString "0XaD"
+                    |> Expect.equal (Z.fromInt 173)
+        , test "173" <|
+            \_ ->
+                Z.fromString "173"
+                    |> Expect.equal (Z.fromInt 173)
+        , test "b10101101" <|
+            \_ ->
+                Z.fromString "b10101101"
+                    |> Expect.equal Nothing
+        , test "-aD" <|
+            \_ ->
+                Z.fromString "-aD"
+                    |> Expect.equal Nothing
+        , test "0x" <|
+            \_ ->
+                Z.fromString "0x"
+                    |> Expect.equal Nothing
         ]
 
 

@@ -3,7 +3,7 @@ module Integer exposing
     , zero, one, two, three, four, five, six, seven, eight, nine, ten
     , negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
     , maxSafeInt, minSafeInt
-    , fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
+    , fromSafeInt, fromInt, fromNatural, fromSafeString, fromString, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
     , abs, negate, add, sub, mul, divModBy, divBy, modBy, exp
@@ -35,7 +35,7 @@ Let `n : Int`. If `minSafeInt <= n && n <= maxSafeInt` then `n` is called a **sa
 
 # Constructors
 
-@docs fromInt, fromSafeInt, fromNatural, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromString, fromSafeString, fromBaseBString
+@docs fromSafeInt, fromInt, fromNatural, fromSafeString, fromString, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromBaseBString
 
 
 # Comparison
@@ -360,31 +360,253 @@ fromNatural n =
         Positive n
 
 
-{-| -}
+{-| Create the integer represented by the given signed base-`b` string.
+
+`b` must be between 2 and 36 inclusive and each character in the string must be a valid base-`b` digit.
+
+
+### About base-`b` digits
+
+A valid base-`b` digit is any digit `d` such that `0 <= d <= b - 1`.
+
+For bases larger than 10, you can use case-insensitive letters from the [Latin alphabet](https://en.wikipedia.org/wiki/Latin_alphabet)
+to represent the base-`b` digits that are 10 or larger. So,
+
+```txt
+A or a represents 10
+B or b represents 11
+C or c represents 12
+...
+Z or z represents 35
+```
+
+For e.g.
+
+If `b = 16` then the valid base-16 digits are `[0-9a-fA-F]`.
+
+If `b = 36` then the valid base-36 digits are `[0-9a-zA-Z]`.
+
+
+### Syntax
+
+```txt
+input ::= -? [digit]+
+digit ::= [0-9a-zA-Z]
+```
+
+Valid strings when `b = 16`:
+
+`"123"`, `"-123"`, `"0"`, `"-0"`, `"-0b11"`, and `"-0xF"`.
+
+Invalid strings when `b = 16`:
+
+  - `"+2"`, since `'+'` is not part of the allowed syntax,
+  - `"5g"`, because `'g'` is not a hexadecimal digit.
+
+
+### Examples
+
+    fromBaseBString 2 "1010" == Just ten
+
+    fromBaseBString 2 "-1010" == Just negativeTen
+
+    fromBaseBString 16 "aD" == fromInt 173
+
+    fromBaseBString 36 "z" == fromInt 35
+
+    fromBaseBString 2 "" == Nothing
+    -- Because the string is empty.
+
+    fromBaseBString 8 "-" == Nothing
+    -- Because there must be at least one octal digit.
+
+    fromBaseBString 10 "A" == Nothing
+    -- Because 'A' is not a decimal digit.
+
+-}
+fromBaseBString : Int -> String -> Maybe Integer
+fromBaseBString b input =
+    String.uncons input
+        |> Maybe.andThen
+            (\( c, restInput ) ->
+                if c == '-' then
+                    N.fromBaseBString b restInput
+                        |> Maybe.map
+                            (\n ->
+                                if N.isZero n then
+                                    Zero
+
+                                else
+                                    Negative n
+                            )
+
+                else
+                    N.fromBaseBString b input
+                        |> Maybe.map
+                            (\n ->
+                                if N.isZero n then
+                                    Zero
+
+                                else
+                                    Positive n
+                            )
+            )
+
+
+{-| Create the integer represented by the given signed binary string.
+
+```txt
+binary ::= -? [0-1]+
+```
+
+For e.g.
+
+    fromBinaryString "0" == Just zero
+
+    fromBinaryString "1010" == Just ten
+
+    fromBinaryString "-1010" == Just negativeTen
+
+    fromBinaryString "" == Nothing
+    -- Because the string is empty.
+
+    fromBinaryString "-" == Nothing
+    -- Because there must be at least one binary digit.
+
+    fromBinaryString "2" == Nothing
+    -- Because '2' is not a binary digit.
+
+-}
 fromBinaryString : String -> Maybe Integer
 fromBinaryString =
     fromBaseBString 2
 
 
-{-| -}
+{-| Create the integer represented by the given signed octal string.
+
+```txt
+octal ::= -? [0-7]+
+```
+
+For e.g.
+
+    fromOctalString "0" == Just zero
+
+    fromOctalString "12" == Just ten
+
+    fromOctalString "-12" == Just negativeTen
+
+    fromOctalString "" == Nothing
+    -- Because the string is empty.
+
+    fromOctalString "-" == Nothing
+    -- Because there must be at least one octal digit.
+
+    fromOctalString "8" == Nothing
+    -- Because '8' is not an octal digit.
+
+-}
 fromOctalString : String -> Maybe Integer
 fromOctalString =
     fromBaseBString 8
 
 
-{-| -}
+{-| Create the integer represented by the given signed decimal string.
+
+```txt
+decimal ::= -? [0-9]+
+```
+
+For e.g.
+
+    fromDecimalString "0" == Just zero
+
+    fromDecimalString "10" == Just ten
+
+    fromDecimalString "-10" == Just negativeTen
+
+    fromDecimalString "" == Nothing
+    -- Because the string is empty.
+
+    fromDecimalString "-" == Nothing
+    -- Because there must be at least one decimal digit.
+
+    fromDecimalString "A" == Nothing
+    -- Because 'A' is not a decimal digit.
+
+-}
 fromDecimalString : String -> Maybe Integer
 fromDecimalString =
     fromBaseBString 10
 
 
-{-| -}
+{-| Create the integer represented by the given signed hexadecimal string.
+
+```txt
+hex ::= -? [0-9a-fA-F]+
+```
+
+For e.g.
+
+    fromHexString "0" == Just zero
+
+    fromHexString "a" == Just ten
+
+    fromHexString "-A" == Just negativeTen
+
+    fromHexString "" == Nothing
+    -- Because the string is empty.
+
+    fromHexString "-" == Nothing
+    -- Because there must be at least one hexadecimal digit.
+
+    fromHexString "5g" == Nothing
+    -- Because 'g' is not a hexadecimal digit.
+
+-}
 fromHexString : String -> Maybe Integer
 fromHexString =
     fromBaseBString 16
 
 
-{-| -}
+{-| Create the integer represented by the given signed string.
+
+
+### Syntax
+
+```txt
+input    ::= signed
+signed   ::= -? unsigned
+unsigned ::= ('0b' | '0B') binary
+           | ('0o' | '0O') octal
+           | ('0x' | '0X') hex
+           | decimal
+binary   ::= [0-1]+
+octal    ::= [0-7]+
+hex      ::= [0-9a-fA-F]+
+decimal  ::= [0-9]+
+```
+
+For e.g.
+
+    fromString "0b10101101" == fromInt 173
+
+    fromString "-0o255" == fromInt -173
+
+    fromString "0XaD" == fromInt 173
+
+    fromString "173" == fromInt 173
+
+    fromString "b10101101" == Nothing
+    -- Because the leading '0' is missing.
+
+    fromString "-aD" == Nothing
+    -- Because 'a' is not a decimal digit.
+
+    fromString "0x" == Nothing
+    -- Because there must be at least one hexadecimal digit.
+
+-}
 fromString : String -> Maybe Integer
 fromString input =
     String.uncons input
@@ -414,47 +636,34 @@ fromString input =
             )
 
 
-{-| -}
+{-| It's best to use this function when you can guarantee that the string you're dealing with
+is a valid input to the [`fromString`](#fromString) function.
+
+If the input is invalid then [`zero`](#zero) is returned.
+
+**N.B.** _Read the documentation of [`fromString`](#fromString) to learn what's considered to
+be valid or invalid input to this function._
+
+This function is useful for establishing **large constants** in a calculation.
+
+    oneGoogol : Natural
+    oneGoogol =
+        -- 10 ^ 100
+        fromSafeString "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+
+Learn more about a [googol](https://en.wikipedia.org/wiki/Googol).
+
+
+### What's considered a large constant?
+
+Since `fromSafeInt n` can be used for `minSafeInt <= n <= maxSafeInt` then it makes sense
+to consider any number smaller than [`minSafeInt`](#minSafeInt) or larger than [`maxSafeInt`](#maxSafeInt),
+a large constant.
+
+-}
 fromSafeString : String -> Integer
 fromSafeString =
     fromString >> Maybe.withDefault Zero
-
-
-{-| -}
-fromBaseBString : Int -> String -> Maybe Integer
-fromBaseBString b input =
-    --
-    -- N.B. The input string must be of the format
-    --
-    --   input ::= -? baseBString"
-    --
-    -- For e.g. "123", "-123", "0", "-0", "-0b11", "-0xF".
-    --
-    String.uncons input
-        |> Maybe.andThen
-            (\( c, restInput ) ->
-                if c == '-' then
-                    N.fromBaseBString b restInput
-                        |> Maybe.map
-                            (\n ->
-                                if N.isZero n then
-                                    Zero
-
-                                else
-                                    Negative n
-                            )
-
-                else
-                    N.fromBaseBString b input
-                        |> Maybe.map
-                            (\n ->
-                                if N.isZero n then
-                                    Zero
-
-                                else
-                                    Positive n
-                            )
-            )
 
 
 
