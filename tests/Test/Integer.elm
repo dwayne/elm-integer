@@ -20,6 +20,7 @@ suite =
         , toNaturalSuite
         , stringConversionSuite
         , comparisonSuite
+        , maxMinSuite
         , predicatesSuite
         , absSuite
         , negateSuite
@@ -370,11 +371,7 @@ stringConversionSuite =
 comparisonSuite : Test
 comparisonSuite =
     describe "compare"
-        [ fuzz2
-            safeInt
-            safeInt
-            "compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)"
-          <|
+        [ fuzz2 safeInt safeInt "compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)" <|
             \a b ->
                 let
                     x =
@@ -389,10 +386,76 @@ comparisonSuite =
             \z ->
                 Z.compare z z
                     |> Expect.equal EQ
+        , fuzz integer "∀ z ∊ ℤ, z < z + 1" <|
+            --
+            -- The integers increase indefinitely without wrapping around or hitting a larget integer.
+            --
+            \z ->
+                (z |> Z.isLessThan (Z.add z Z.one))
+                    |> Expect.equal True
+        , fuzz integer "∀ z ∊ ℤ, z - 1 < z" <|
+            --
+            -- The integers decrease indefinitely without wrapping around or hitting a smallest integer.
+            --
+            \z ->
+                (Z.sub z Z.one |> Z.isLessThan z)
+                    |> Expect.equal True
+        , test "-5 < -2" <|
+            \_ ->
+                (Z.negativeFive |> Z.isLessThan Z.negativeTwo)
+                    |> Expect.equal True
+        , test "-2 <= -2" <|
+            \_ ->
+                (Z.negativeTwo |> Z.isLessThanOrEqual Z.negativeTwo)
+                    |> Expect.equal True
+        , test "5 > -10" <|
+            \_ ->
+                (Z.five |> Z.isGreaterThan Z.negativeTen)
+                    |> Expect.equal True
+        , test "-10 >= -10" <|
+            \_ ->
+                (Z.negativeTen |> Z.isGreaterThanOrEqual Z.negativeTen)
+                    |> Expect.equal True
+        ]
 
-        -- TODO:
-        -- 1. Add z < z + 1
-        -- 2. Add z - 1 < z
+
+maxMinSuite : Test
+maxMinSuite =
+    describe "max / min"
+        [ fuzz2 integer integer "∀ x, y ∊ ℤ, if x < y then max x y == y else max x y == x" <|
+            \x y ->
+                if x |> Z.isLessThan y then
+                    Z.max x y
+                        |> Expect.equal y
+
+                else
+                    Z.max x y
+                        |> Expect.equal x
+        , fuzz2 integer integer "∀ x, y ∊ ℤ, if x > y then min x y == y else min x y == x" <|
+            \x y ->
+                if x |> Z.isGreaterThan y then
+                    Z.min x y
+                        |> Expect.equal y
+
+                else
+                    Z.min x y
+                        |> Expect.equal x
+        , test "max 5 -10 == 5" <|
+            \_ ->
+                Z.max Z.five Z.negativeTen
+                    |> Expect.equal Z.five
+        , test "max -5 -2 == -2" <|
+            \_ ->
+                Z.max Z.negativeFive Z.negativeTwo
+                    |> Expect.equal Z.negativeTwo
+        , test "min 5 -10 == -10" <|
+            \_ ->
+                Z.min Z.five Z.negativeTen
+                    |> Expect.equal Z.negativeTen
+        , test "min -5 -2 == -5" <|
+            \_ ->
+                Z.min Z.negativeFive Z.negativeTwo
+                    |> Expect.equal Z.negativeFive
         ]
 
 

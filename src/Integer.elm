@@ -670,7 +670,15 @@ fromSafeString =
 -- COMPARISON
 
 
-{-| -}
+{-| Compare any two integers.
+
+    compare negativeFive negativeTwo == LT
+
+    compare two two == EQ
+
+    compare five negativeTen == GT
+
+-}
 compare : Integer -> Integer -> Order
 compare x y =
     case x of
@@ -702,7 +710,15 @@ compare x y =
                     GT
 
 
-{-| -}
+{-| Determine if the second integer is less than the first.
+
+    (negativeFive |> isLessThan negativeTwo) == True
+
+    (two |> isLessThan two) == False
+
+    (five |> isLessThan negativeTen) == False
+
+-}
 isLessThan : Integer -> Integer -> Bool
 isLessThan y x =
     --
@@ -711,7 +727,15 @@ isLessThan y x =
     compare x y == LT
 
 
-{-| -}
+{-| Determine if the second integer is less than or equal to the first.
+
+    (negativeFive |> isLessThanOrEqual negativeTwo) == True
+
+    (two |> isLessThanOrEqual two) == True
+
+    (five |> isLessThanOrEqual negativeTen) == False
+
+-}
 isLessThanOrEqual : Integer -> Integer -> Bool
 isLessThanOrEqual y x =
     --
@@ -722,7 +746,15 @@ isLessThanOrEqual y x =
     not (x |> isGreaterThan y)
 
 
-{-| -}
+{-| Determine if the second integer is greater than the first.
+
+    (negativeFive |> isGreaterThan negativeTwo) == False
+
+    (two |> isGreaterThan two) == False
+
+    (five |> isGreaterThan negativeTen) == True
+
+-}
 isGreaterThan : Integer -> Integer -> Bool
 isGreaterThan y x =
     --
@@ -731,7 +763,15 @@ isGreaterThan y x =
     compare x y == GT
 
 
-{-| -}
+{-| Determine if the second integer is greater than or equal to the first.
+
+    (negativeFive |> isGreaterThanOrEqual negativeTwo) == False
+
+    (two |> isGreaterThanOrEqual two) == True
+
+    (five |> isGreaterThanOrEqual negativeTen) == True
+
+-}
 isGreaterThanOrEqual : Integer -> Integer -> Bool
 isGreaterThanOrEqual y x =
     --
@@ -742,7 +782,13 @@ isGreaterThanOrEqual y x =
     not (x |> isLessThan y)
 
 
-{-| -}
+{-| Find the larger of two integers.
+
+    max five negativeTen == five
+
+    max negativeFive negativeTwo == negativeTwo
+
+-}
 max : Integer -> Integer -> Integer
 max x y =
     if x |> isLessThan y then
@@ -752,7 +798,13 @@ max x y =
         x
 
 
-{-| -}
+{-| Find the smaller of two integers.
+
+    min five negativeTen == negativeTen
+
+    min negativeFive negativeTwo == negativeFive
+
+-}
 min : Integer -> Integer -> Integer
 min x y =
     if x |> isGreaterThan y then
