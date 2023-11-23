@@ -7,7 +7,7 @@ module Integer exposing
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
     , abs, negate, add, sub, mul, divModBy, divBy, modBy, exp
-    , toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
+    , toInt, toNatural, toString, toBinaryString, toOctalString, toDecimalString, toHexString, toBaseBString
     )
 
 {-| Compute with the [integers](https://en.wikipedia.org/wiki/Integer), ℤ = { ..., -2, -1, 0, 1, 2, ... }.
@@ -63,7 +63,7 @@ For all other comparisons you will have to use the functions below.
 
 # Conversion
 
-@docs toInt, toNatural, toBinaryString, toOctalString, toDecimalString, toHexString, toString, toBaseBString
+@docs toInt, toNatural, toString, toBinaryString, toOctalString, toDecimalString, toHexString, toBaseBString
 
 -}
 
@@ -1090,7 +1090,36 @@ exp x n =
 -- CONVERSION
 
 
-{-| -}
+{-| Convert any integer, `z`, to `sign z * (|z| mod (maxSafeInt + 1))`, where
+
+```txt
+sign z =
+    -1 if z < 0
+     0 if z = 0
+     1 if z > 0
+```
+
+For e.g.
+
+    toInt zero == 0
+
+    toInt ten == 10
+
+    toInt negativeTen == -10
+
+    toInt (fromSafeInt maxSafeInt) == maxSafeInt
+
+    toInt (fromSafeInt minSafeInt) == minSafeInt
+
+    toInt (add (fromSafeInt maxSafeInt) one) == 0
+
+    toInt (add (fromSafeInt maxSafeInt) ten) == 9
+
+    toInt (sub (fromSafeInt minSafeInt) one) == 0
+
+    toInt (sub (fromSafeInt minSafeInt) ten) == -9
+
+-}
 toInt : Integer -> Int
 toInt z =
     case z of
@@ -1104,12 +1133,10 @@ toInt z =
             -(N.toInt n)
 
 
-{-| -}
+{-| Get the absolute value of the given integer as a natural number. If you want it as an integer, use [`abs`](#abs).
+-}
 toNatural : Integer -> Natural
 toNatural z =
-    --
-    -- It returns the absolute value of z as a Natural.
-    --
     case z of
         Zero ->
             N.zero
@@ -1121,37 +1148,70 @@ toNatural z =
             n
 
 
-{-| -}
-toBinaryString : Integer -> String
-toBinaryString =
-    toBaseBString 2 >> Maybe.withDefault ""
-
-
-{-| -}
-toOctalString : Integer -> String
-toOctalString =
-    toBaseBString 8 >> Maybe.withDefault ""
-
-
-{-| -}
-toDecimalString : Integer -> String
-toDecimalString =
-    toBaseBString 10 >> Maybe.withDefault ""
-
-
-{-| -}
-toHexString : Integer -> String
-toHexString =
-    toBaseBString 16 >> Maybe.withDefault ""
-
-
-{-| -}
+{-| An alias for [`toDecimalString`](#toDecimalString).
+-}
 toString : Integer -> String
 toString =
     toDecimalString
 
 
-{-| -}
+{-| Convert any integer to its signed binary (base-2) representation.
+
+TODO
+
+-}
+toBinaryString : Integer -> String
+toBinaryString =
+    toBaseBString 2 >> Maybe.withDefault ""
+
+
+{-| Convert any integer to its signed octal (base-8) representation.
+
+TODO
+
+-}
+toOctalString : Integer -> String
+toOctalString =
+    toBaseBString 8 >> Maybe.withDefault ""
+
+
+{-| Convert any integer to its signed decimal (base-10) representation.
+
+TODO
+
+-}
+toDecimalString : Integer -> String
+toDecimalString =
+    toBaseBString 10 >> Maybe.withDefault ""
+
+
+{-| Convert any integer to its signed hexadecimal (base-16) representation.
+
+TODO
+
+-}
+toHexString : Integer -> String
+toHexString =
+    toBaseBString 16 >> Maybe.withDefault ""
+
+
+{-| Convert any integer to its signed base-`b` representation.
+
+`b` must be between 2 and 36 inclusive and each character in the resulting string
+will be a valid base-`b` digit.
+
+All [Latin letters](https://en.wikipedia.org/wiki/Latin_alphabet) in the base-`b`
+representation will be uppercased.
+
+TODO
+
+For any `k : Int` where `k < 2` or `k > 36`, and any `z : Integer`,
+
+    toBaseBString k z == Nothing
+
+**N.B.** _Please refer to [`fromBaseBString`](#about-base-b-digits) to learn more about base-`b` digits._
+
+-}
 toBaseBString : Int -> Integer -> Maybe String
 toBaseBString b z =
     case z of

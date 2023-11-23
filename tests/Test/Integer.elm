@@ -16,6 +16,8 @@ suite =
         , fromNaturalSuite
         , fromBaseBStringSuite
         , fromStringSuite
+        , toIntSuite
+        , toNaturalSuite
         , comparisonSuite
         , predicatesSuite
         , absSuite
@@ -287,6 +289,58 @@ fromStringSuite =
             \_ ->
                 Z.fromString "0x"
                     |> Expect.equal Nothing
+        ]
+
+
+toIntSuite : Test
+toIntSuite =
+    describe "toInt"
+        [ test "0" <|
+            \_ ->
+                Z.toInt Z.zero
+                    |> Expect.equal 0
+        , test "10" <|
+            \_ ->
+                Z.toInt Z.ten
+                    |> Expect.equal 10
+        , test "-10" <|
+            \_ ->
+                Z.toInt Z.negativeTen
+                    |> Expect.equal -10
+        , test "maxSafeInt" <|
+            \_ ->
+                Z.toInt (Z.fromSafeInt Z.maxSafeInt)
+                    |> Expect.equal Z.maxSafeInt
+        , test "minSafeInt" <|
+            \_ ->
+                Z.toInt (Z.fromSafeInt Z.minSafeInt)
+                    |> Expect.equal Z.minSafeInt
+        , test "maxSafeInt + 1" <|
+            \_ ->
+                Z.toInt (Z.add (Z.fromSafeInt Z.maxSafeInt) Z.one)
+                    |> Expect.equal 0
+        , test "maxSafeInt + 10" <|
+            \_ ->
+                Z.toInt (Z.add (Z.fromSafeInt Z.maxSafeInt) Z.ten)
+                    |> Expect.equal 9
+        , test "minSafeInt - 1" <|
+            \_ ->
+                Z.toInt (Z.sub (Z.fromSafeInt Z.minSafeInt) Z.one)
+                    |> Expect.equal 0
+        , test "minSafeInt - 10" <|
+            \_ ->
+                Z.toInt (Z.sub (Z.fromSafeInt Z.minSafeInt) Z.ten)
+                    |> Expect.equal -9
+        ]
+
+
+toNaturalSuite : Test
+toNaturalSuite =
+    describe "toNatural"
+        [ fuzz integer "∀ z ∊ ℤ, fromNatural (toNatural z) == abs z" <|
+            \z ->
+                Z.fromNatural (Z.toNatural z)
+                    |> Expect.equal (Z.abs z)
         ]
 
 
