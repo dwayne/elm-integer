@@ -18,6 +18,7 @@ suite =
         , fromStringSuite
         , toIntSuite
         , toNaturalSuite
+        , stringConversionSuite
         , comparisonSuite
         , predicatesSuite
         , absSuite
@@ -341,6 +342,28 @@ toNaturalSuite =
             \z ->
                 Z.fromNatural (Z.toNatural z)
                     |> Expect.equal (Z.abs z)
+        ]
+
+
+stringConversionSuite : Test
+stringConversionSuite =
+    describe "binary, octal, decimal, and hexadecimal string conversions"
+        [ fuzz integer "∀ z ∊ ℤ, fromBinaryString (toBinaryString z) == Just z" <|
+            \z ->
+                Z.fromBinaryString (Z.toBinaryString z)
+                    |> Expect.equal (Just z)
+        , fuzz integer "∀ z ∊ ℤ, fromOctalString (toOctalString z) == Just z" <|
+            \z ->
+                Z.fromOctalString (Z.toOctalString z)
+                    |> Expect.equal (Just z)
+        , fuzz integer "∀ z ∊ ℤ, fromDecimalString (toDecimalString z) == Just z" <|
+            \z ->
+                Z.fromDecimalString (Z.toDecimalString z)
+                    |> Expect.equal (Just z)
+        , fuzz integer "∀ z ∊ ℤ, fromHexString (toHexString z) == Just z" <|
+            \z ->
+                Z.fromHexString (Z.toHexString z)
+                    |> Expect.equal (Just z)
         ]
 
 

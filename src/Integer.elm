@@ -1157,7 +1157,19 @@ toString =
 
 {-| Convert any integer to its signed binary (base-2) representation.
 
-TODO
+    toBinaryString zero == "0"
+
+    toBinaryString one == "1"
+
+    toBinaryString ten == "1010"
+
+    toBinaryString negativeTen == "-1010"
+
+    toBinaryString (fromSafeInt -1729) == "-11011000001"
+
+    toBinaryString (add (fromSafeInt maxSafeInt) one) == "100000000000000000000000000000000000000000000000000000"
+
+    toBinaryString (sub (fromSafeInt minSafeInt) one) == "-100000000000000000000000000000000000000000000000000000"
 
 -}
 toBinaryString : Integer -> String
@@ -1167,7 +1179,19 @@ toBinaryString =
 
 {-| Convert any integer to its signed octal (base-8) representation.
 
-TODO
+    toOctalString zero == "0"
+
+    toOctalString one == "1"
+
+    toOctalString ten == "12"
+
+    toOctalString negativeTen == "-12"
+
+    toOctalString (fromSafeInt -1729) == "-3301"
+
+    toOctalString (add (fromSafeInt maxSafeInt) one) == "400000000000000000"
+
+    toOctalString (sub (fromSafeInt minSafeInt) one) == "-400000000000000000"
 
 -}
 toOctalString : Integer -> String
@@ -1177,7 +1201,19 @@ toOctalString =
 
 {-| Convert any integer to its signed decimal (base-10) representation.
 
-TODO
+    toDecimalString zero == "0"
+
+    toDecimalString one == "1"
+
+    toDecimalString ten == "10"
+
+    toDecimalString negativeTen == "-10"
+
+    toDecimalString (fromSafeInt -1729) == "-1729"
+
+    toDecimalString (add (fromSafeInt maxSafeInt) one) == "9007199254740992"
+
+    toDecimalString (sub (fromSafeInt minSafeInt) one) == "-9007199254740992"
 
 -}
 toDecimalString : Integer -> String
@@ -1187,7 +1223,19 @@ toDecimalString =
 
 {-| Convert any integer to its signed hexadecimal (base-16) representation.
 
-TODO
+    toHexString zero == "0"
+
+    toHexString one == "1"
+
+    toHexString ten == "A"
+
+    toHexString negativeTen == "-A"
+
+    toHexString (fromSafeInt -1729) == "-6C1"
+
+    toHexString (add (fromSafeInt maxSafeInt) one) == "20000000000000"
+
+    toHexString (sub (fromSafeInt minSafeInt) one) == "-20000000000000"
 
 -}
 toHexString : Integer -> String
@@ -1203,7 +1251,17 @@ will be a valid base-`b` digit.
 All [Latin letters](https://en.wikipedia.org/wiki/Latin_alphabet) in the base-`b`
 representation will be uppercased.
 
-TODO
+For e.g.
+
+    toBaseBString 2 (fromSafeInt 1729) == Just "11011000001"
+
+    toBaseBString 8 (fromSafeInt -1729) == Just "-3301"
+
+    toBaseBString 10 (fromSafeInt 1729) == Just "1729"
+
+    toBaseBString 16 (fromSafeInt -1729) == Just "-6C1"
+
+    toBaseBString 36 (fromSafeInt 1729) == Just "1C1"
 
 For any `k : Int` where `k < 2` or `k > 36`, and any `z : Integer`,
 
