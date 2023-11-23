@@ -818,43 +818,103 @@ min x y =
 -- PREDICATES
 
 
-{-| -}
+{-| Determine if the integer is negative (i.e. less than `0`).
+
+    isNegative negativeTwo == True
+
+    isNegative zero == False
+
+    isNegative two == False
+
+-}
 isNegative : Integer -> Bool
 isNegative =
     isLessThan zero
 
 
-{-| -}
+{-| Determine if the integer is non-negative (i.e. not negative, so greater than or equal to `0`).
+
+    isNonNegative negativeTwo == False
+
+    isNonNegative zero == True
+
+    isNonNegative two == True
+
+-}
 isNonNegative : Integer -> Bool
 isNonNegative =
     not << isNegative
 
 
-{-| -}
+{-| Determine if the integer is `0`.
+
+    isZero zero == True
+
+    isZero negativeSeven == False
+
+    isZero six == False
+
+-}
 isZero : Integer -> Bool
 isZero =
     (==) zero
 
 
-{-| -}
+{-| Determine if the integer is non-zero (i.e. not `0`, so either positive or negative).
+
+    isNonZero zero == False
+
+    isNonZero negativeSeven == True
+
+    isNonZero six == True
+
+-}
 isNonZero : Integer -> Bool
 isNonZero =
     not << isZero
 
 
-{-| -}
+{-| Determine if the integer is positive (i.e. greater than `0`).
+
+    isPositive five == True
+
+    isPositive zero == False
+
+    isPositive negativeEight == False
+
+-}
 isPositive : Integer -> Bool
 isPositive =
     isGreaterThan zero
 
 
-{-| -}
+{-| Determine if the integer is non-positive (i.e. not positive, so less than or equal to `0`).
+
+    isNonPositive five == False
+
+    isNonPositive zero == True
+
+    isNonPositive negativeEight == True
+
+-}
 isNonPositive : Integer -> Bool
 isNonPositive =
     not << isPositive
 
 
-{-| -}
+{-| Determine if the integer is even (i.e. divisible by `2`).
+
+    isEven zero == True
+
+    isEven negativeFour == True
+
+    isEven eight == True
+
+    isEven three == False
+
+    isEven negativeNine == False
+
+-}
 isEven : Integer -> Bool
 isEven z =
     case z of
@@ -868,7 +928,19 @@ isEven z =
             N.isEven n
 
 
-{-| -}
+{-| Determine if the integer is odd (i.e. not even, so not divisible by `2`).
+
+    isOdd zero == False
+
+    isOdd negativeFour == False
+
+    isOdd eight == False
+
+    isOdd three == True
+
+    isOdd negativeNine == True
+
+-}
 isOdd : Integer -> Bool
 isOdd =
     not << isEven
