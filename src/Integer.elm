@@ -343,7 +343,8 @@ fromSafeInt =
     fromInt >> Maybe.withDefault Zero
 
 
-{-| If you happen to have a natural number at hand then you can convert it to an integer using this function.
+{-| If you happen to have a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural)
+at hand then you can convert it to an integer using this function.
 
 For all `n : Natural`:
 
@@ -950,7 +951,20 @@ isOdd =
 -- ARITHMETIC
 
 
-{-| -}
+{-| Compute the [absolute value](https://en.wikipedia.org/wiki/Absolute_value) of the given integer.
+If you want it as a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural),
+use [`toNatural`](#toNatural).
+
+You can think of the absolute value of an integer as its distance from `0`.
+
+    abs zero == zero
+
+    abs five == five
+
+    abs negativeFive = five
+    -- Because 5 and -5 are the same distance away from 0.
+
+-}
 abs : Integer -> Integer
 abs z =
     case z of
@@ -961,7 +975,20 @@ abs z =
             z
 
 
-{-| -}
+{-| Compute the [additive inverse](https://en.wikipedia.org/wiki/Additive_inverse) of the given integer.
+
+The additive inverse of an integer, `z`, is the integer that, when added to `z`, yields `0`.
+
+    negate five == negativeFive
+    -- Because 5 + (-5) = 0.
+
+    negate negativeFive == five
+    -- Because -5 + 5 = 0.
+
+    negate zero == zero
+    -- Becase 0 + 0 = 0.
+
+-}
 negate : Integer -> Integer
 negate z =
     case z of
@@ -975,7 +1002,8 @@ negate z =
             z
 
 
-{-| -}
+{-| Add two integers.
+-}
 add : Integer -> Integer -> Integer
 add x y =
     case ( x, y ) of
@@ -1038,7 +1066,13 @@ add x y =
             Positive <| N.add a b
 
 
-{-| -}
+{-| Subtract the second integer from the first.
+
+    sub ten four == six
+
+    sub four ten == negativeSix
+
+-}
 sub : Integer -> Integer -> Integer
 sub x y =
     --
@@ -1047,7 +1081,8 @@ sub x y =
     add x <| negate y
 
 
-{-| -}
+{-| Multiply two integers.
+-}
 mul : Integer -> Integer -> Integer
 mul x y =
     case ( x, y ) of
@@ -1088,8 +1123,59 @@ mul x y =
             Positive <| N.mul a b
 
 
-{-| -}
-divModBy : Integer -> Integer -> Maybe ( Integer, Natural )
+{-| Find the quotient and remainder when the second integer is divided by the first.
+This is called [Euclidean division](https://en.wikipedia.org/wiki/Euclidean_division)
+or **division with remainder**.
+
+We define the Euclidean division of two integers `D` (the dividend) and `d ≠ 0` (the divisor),
+as producing two integers `q` (the quotient) and `r` (the remainder) such that
+
+  - `d * q` is the greatest multiple of `d` less than or equal to `D`, and
+  - `r = D - d * q` (which implies `r` is always non-negative).
+
+For e.g.
+
+    (ten |> divModBy two) == Just (five, zero)
+    -- Because 2 * 5 is the greatest multiple of 2 less than or equal to 10,
+    -- and 0 = 10 - (2 * 5).
+
+    (ten |> divModBy negativeTwo) == Just (negativeFive, zero)
+    -- Because -2 * -5 is the greatest multiple of -2 less than or equal to 10,
+    -- and 0 = 10 - (-2 * -5).
+
+    (negativeTen |> divModBy two) == Just (negativeFive, zero)
+    -- Because 2 * -5 is the greatest multiple of 2 less than or equal to -10,
+    -- and 0 = -10 - (2 * -5).
+
+    (negativeTen |> divModBy negativeTwo) == Just (five, zero)
+    -- Because -2 * 5 is the greatest multiple of -2 less than or equal to -10,
+    -- and 0 = -10 - (-2 * 5).
+
+    (ten |> divModBy three) == Just (three, one)
+    -- Because 3 * 3 is the greatest multiple of 3 less than or equal to 10,
+    -- and 1 = 10 - (3 * 3).
+
+    (ten |> divModBy negativeThree) == Just (negativeThree, one)
+    -- Because -3 * -3 is the greatest multiple of -3 less than or equal to 10,
+    -- and 1 = 10 - (-3 * -3).
+
+    (negativeTen |> divModBy three) == Just (negativeFour, two)
+    -- Because 3 * -4 is the greatest multiple of 3 less than or equal to -10,
+    -- and 2 = -10 - (3 * -4).
+
+    (negativeTen |> divModBy negativeThree) == Just (four, two)
+    -- Because -3 * 4 is the greatest multiple of -3 less than or equal to -10,
+    -- and 2 = -10 - (-3 * 4).
+
+Division by `0` is not allowed. So, for all `z : Integer`,
+
+    (z |> divModBy zero) == Nothing
+
+**N.B.** _This [Euclidean division article by Probabilistic World](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/)
+is well written and can help you understand the operation in greater depth._
+
+-}
+divModBy : Integer -> Integer -> Maybe ( Integer, Integer )
 divModBy divisor dividend =
     case ( divisor, dividend ) of
         ( Zero, _ ) ->
@@ -1102,7 +1188,7 @@ divModBy divisor dividend =
             --
             -- Anything divided by 0 is 0.
             --
-            Just ( zero, N.zero )
+            Just ( zero, zero )
 
         ( Positive b, Positive a ) ->
             --
@@ -1111,7 +1197,7 @@ divModBy divisor dividend =
             -- 10 = 3 * 3 + 1
             --
             N.divModBy b a
-                |> Maybe.map (Tuple.mapFirst fromNatural)
+                |> Maybe.map (Tuple.mapBoth fromNatural fromNatural)
 
         ( Negative b, Positive a ) ->
             --
@@ -1120,7 +1206,7 @@ divModBy divisor dividend =
             -- 10 = -3 * -3 + 1
             --
             N.divModBy b a
-                |> Maybe.map (Tuple.mapFirst <| negate << fromNatural)
+                |> Maybe.map (Tuple.mapBoth (negate << fromNatural) fromNatural)
 
         ( Positive b, Negative a ) ->
             --
@@ -1136,6 +1222,7 @@ divModBy divisor dividend =
                                 |> fromNatural
                                 |> negate
                             , r
+                                |> fromNatural
                             )
 
                         else
@@ -1144,6 +1231,7 @@ divModBy divisor dividend =
                                 |> fromNatural
                                 |> negate
                             , N.sub b r
+                                |> fromNatural
                             )
                     )
 
@@ -1157,32 +1245,67 @@ divModBy divisor dividend =
                 |> Maybe.map
                     (\( q, r ) ->
                         if N.isZero r then
-                            ( fromNatural q, r )
+                            ( fromNatural q, fromNatural r )
 
                         else
                             ( q
                                 |> N.add N.one
                                 |> fromNatural
                             , N.sub b r
+                                |> fromNatural
                             )
                     )
 
 
-{-| -}
+{-| Find the quotient when the second integer is divided by the first.
+
+**N.B.** _Please see [`divModBy`](#divModBy) to understand how we define Euclidean division._
+
+-}
 divBy : Integer -> Integer -> Maybe Integer
 divBy divisor dividend =
     divModBy divisor dividend
         |> Maybe.map Tuple.first
 
 
-{-| -}
-modBy : Integer -> Integer -> Maybe Natural
+{-| Find the remainder when the second integer is divided by the first.
+
+**N.B.** _Please see [`divModBy`](#divModBy) to understand how we define Euclidean division._
+
+-}
+modBy : Integer -> Integer -> Maybe Integer
 modBy divisor dividend =
     divModBy divisor dividend
         |> Maybe.map Tuple.second
 
 
-{-| -}
+{-| Integer exponentiation. Find the power of the integer (called the base) to the natural number (called the exponent).
+
+Given,
+
+    import Natural as N
+
+Then,
+
+    exp two N.three == eight
+
+    exp negativeTwo N.three == negativeEight
+
+For all `z : Integer`,
+
+    exp z N.zero == one
+
+In particular,
+
+    exp zero N.zero == one
+
+**N.B.** _You can read "[What is `0^0`?](https://maa.org/book/export/html/116806)" to learn more_.
+
+For all `n : Natural`, where `n` is non-zero,
+
+    exp zero n == zero
+
+-}
 exp : Integer -> Natural -> Integer
 exp x n =
     case x of
@@ -1257,7 +1380,9 @@ toInt z =
             -(N.toInt n)
 
 
-{-| Get the absolute value of the given integer as a natural number. If you want it as an integer, use [`abs`](#abs).
+{-| Compute the [absolute value](https://en.wikipedia.org/wiki/Absolute_value) of the given integer as a
+[natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural).
+If you want an [`Integer`](#Integer), use [`abs`](#abs).
 -}
 toNatural : Integer -> Natural
 toNatural z =

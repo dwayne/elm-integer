@@ -153,7 +153,7 @@ fromIntSuite =
             \_ ->
                 Z.fromInt (Z.maxSafeInt + 1)
                     |> Expect.equal Nothing
-        , describe "for all safe integers z, toInt (fromInt z) == z"
+        , describe "for all safe integers s, toInt (fromInt s) == s"
             [ test "maxSafeInt" <|
                 \_ ->
                     Z.fromInt Z.maxSafeInt
@@ -165,10 +165,10 @@ fromIntSuite =
                         |> Maybe.map Z.toInt
                         |> Expect.equal (Just Z.minSafeInt)
             , fuzz safeInt "safe integers" <|
-                \z ->
-                    Z.fromInt z
+                \s ->
+                    Z.fromInt s
                         |> Maybe.map Z.toInt
-                        |> Expect.equal (Just z)
+                        |> Expect.equal (Just s)
             ]
         ]
 
@@ -371,7 +371,7 @@ stringConversionSuite =
 comparisonSuite : Test
 comparisonSuite =
     describe "compare"
-        [ fuzz2 safeInt safeInt "compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)" <|
+        [ fuzz2 safeInt safeInt "for all safe integers a and b, compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)" <|
             \a b ->
                 let
                     x =
@@ -463,12 +463,12 @@ predicatesSuite : Test
 predicatesSuite =
     describe "predicates"
         [ fuzz safeInt "isNegative / isNonNegative" <|
-            \a ->
+            \s ->
                 let
                     z =
-                        Z.fromSafeInt a
+                        Z.fromSafeInt s
                 in
-                if a < 0 then
+                if s < 0 then
                     Z.isNegative z
                         |> Expect.equal True
 
@@ -476,12 +476,12 @@ predicatesSuite =
                     Z.isNonNegative z
                         |> Expect.equal True
         , fuzz safeInt "isZero / isNonZero" <|
-            \a ->
+            \s ->
                 let
                     z =
-                        Z.fromSafeInt a
+                        Z.fromSafeInt s
                 in
-                if a == 0 then
+                if s == 0 then
                     Z.isZero z
                         |> Expect.equal True
 
@@ -489,12 +489,12 @@ predicatesSuite =
                     Z.isNonZero z
                         |> Expect.equal True
         , fuzz safeInt "isPositive / isNonPositive" <|
-            \a ->
+            \s ->
                 let
                     z =
-                        Z.fromSafeInt a
+                        Z.fromSafeInt s
                 in
-                if a > 0 then
+                if s > 0 then
                     Z.isPositive z
                         |> Expect.equal True
 
@@ -502,12 +502,12 @@ predicatesSuite =
                     Z.isNonPositive z
                         |> Expect.equal True
         , fuzz safeInt "isEven / isOdd" <|
-            \a ->
+            \s ->
                 let
                     z =
-                        Z.fromSafeInt a
+                        Z.fromSafeInt s
                 in
-                if isEven a then
+                if isEven s then
                     Z.isEven z
                         |> Expect.equal True
 
@@ -520,15 +520,9 @@ predicatesSuite =
 absSuite : Test
 absSuite =
     describe "abs"
-        [ fuzz safeInt "|a| = Z.toInt |Z.fromSafeInt a|" <|
-            \a ->
-                let
-                    z =
-                        Z.fromSafeInt a
-                in
-                Z.abs z
-                    |> Z.toInt
-                    |> Expect.equal (abs a)
+        [ fuzz safeInt "for all safe integers s, |s| == Z.toInt |Z.fromSafeInt s|" <|
+            \s ->
+                abs s |> Expect.equal (Z.toInt <| Z.abs <| Z.fromSafeInt s)
         , fuzz integer "∀ z ∊ ℤ, |z| >= 0" <|
             \z ->
                 Z.abs z
@@ -540,15 +534,9 @@ absSuite =
 negateSuite : Test
 negateSuite =
     describe "negate"
-        [ fuzz safeInt "-a == Z.toInt (Z.negate (Z.fromSafeInt a))" <|
-            \a ->
-                let
-                    z =
-                        Z.fromSafeInt a
-                in
-                Z.negate z
-                    |> Z.toInt
-                    |> Expect.equal -a
+        [ fuzz safeInt "for all safe integers s, -s == Z.toInt (Z.negate (Z.fromSafeInt s))" <|
+            \s ->
+                -s |> Expect.equal (Z.toInt <| Z.negate <| Z.fromSafeInt s)
         , fuzz integer "∀ z ∊ ℤ, -(-z) == z" <|
             \z ->
                 Z.negate (Z.negate z)
@@ -695,44 +683,44 @@ euclideanDivisionSuite =
         [ test "10 ÷ 2" <|
             \_ ->
                 (Z.ten |> Z.divModBy Z.two)
-                    |> Expect.equal (Just ( Z.five, N.zero ))
+                    |> Expect.equal (Just ( Z.five, Z.zero ))
         , test "10 ÷ (-2)" <|
             \_ ->
                 (Z.ten |> Z.divModBy Z.negativeTwo)
-                    |> Expect.equal (Just ( Z.negativeFive, N.zero ))
+                    |> Expect.equal (Just ( Z.negativeFive, Z.zero ))
         , test "(-10) ÷ 2" <|
             \_ ->
                 (Z.negativeTen |> Z.divModBy Z.two)
-                    |> Expect.equal (Just ( Z.negativeFive, N.zero ))
+                    |> Expect.equal (Just ( Z.negativeFive, Z.zero ))
         , test "(-10) ÷ (-2)" <|
             \_ ->
                 (Z.negativeTen |> Z.divModBy Z.negativeTwo)
-                    |> Expect.equal (Just ( Z.five, N.zero ))
+                    |> Expect.equal (Just ( Z.five, Z.zero ))
         , test "10 ÷ 3" <|
             \_ ->
                 (Z.ten |> Z.divModBy Z.three)
-                    |> Expect.equal (Just ( Z.three, N.one ))
+                    |> Expect.equal (Just ( Z.three, Z.one ))
         , test "10 ÷ (-3)" <|
             \_ ->
                 (Z.ten |> Z.divModBy Z.negativeThree)
-                    |> Expect.equal (Just ( Z.negativeThree, N.one ))
+                    |> Expect.equal (Just ( Z.negativeThree, Z.one ))
         , test "(-10) ÷ 3" <|
             \_ ->
                 (Z.negativeTen |> Z.divModBy Z.three)
-                    |> Expect.equal (Just ( Z.negativeFour, N.two ))
+                    |> Expect.equal (Just ( Z.negativeFour, Z.two ))
         , test "(-10) ÷ (-3)" <|
             \_ ->
                 (Z.negativeTen |> Z.divModBy Z.negativeThree)
-                    |> Expect.equal (Just ( Z.four, N.two ))
+                    |> Expect.equal (Just ( Z.four, Z.two ))
         , fuzz2 integer integer "∀ D ∊ ℤ, d ∊ ℤ - {0}, D = d * q + r where q ∊ ℤ and 0 ≤ r < |d|" <|
             \bigD d ->
                 case bigD |> Z.divModBy d of
                     Just ( q, r ) ->
                         ( bigD
-                        , r |> N.isLessThan (Z.toNatural d)
+                        , (r |> Z.isGreaterThanOrEqual Z.zero) && (r |> Z.isLessThan (Z.abs d))
                         )
                             |> Expect.equal
-                                ( Z.add (Z.mul d q) (Z.fromNatural r)
+                                ( Z.add (Z.mul d q) r
                                 , True
                                 )
 
