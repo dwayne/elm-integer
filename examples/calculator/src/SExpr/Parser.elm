@@ -2,7 +2,7 @@ module SExpr.Parser exposing (atom, integer, sexpr)
 
 import Integer as Z exposing (Integer)
 import Parser as P exposing ((|.), (|=), Parser)
-import SExpr.AST exposing (Atom(..), SExpr(..))
+import SExpr.AST exposing (..)
 
 
 sexpr : Parser SExpr
