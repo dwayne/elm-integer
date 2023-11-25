@@ -2,6 +2,7 @@
 
 cd "${project:?}" && \
   elm-format         \
+    examples         \
     src              \
     tests            \
     "${@:---yes}"

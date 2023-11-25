@@ -1,0 +1,24 @@
+SExpr ::= Atom
+        | Integer
+        | '(' SExpr* ')'
+
+Atom ::= 'abs'
+       | 'negate'
+       | 'add'
+       | 'sub'
+       | 'mul'
+       | 'div'
+       | 'mod'
+
+Integer   ::= Sign Magnitude
+Sign      ::= '-'?
+Magnitude ::= ('0b' | '0B') Binary
+            | ('0o' | '0O') Octal
+            | ('0x' | '0X') Hex
+            | Decimal
+Binary    ::= [0-1]+
+Octal     ::= [0-7]+
+Hex       ::= [0-9a-fA-F]+
+Decimal   ::= [0-9]+
+
+/* Use https://www.bottlecaps.de/rr/ui to view it as a Railroad Diagram. */
