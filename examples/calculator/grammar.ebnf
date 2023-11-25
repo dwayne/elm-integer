@@ -9,6 +9,7 @@ Atom ::= 'abs'
        | 'mul'
        | 'div'
        | 'mod'
+       | 'exp'
 
 Integer   ::= Sign Magnitude
 Sign      ::= '-'?

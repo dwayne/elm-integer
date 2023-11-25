@@ -17,3 +17,4 @@ type Atom
     | Mul
     | Div
     | Mod
+    | Exp

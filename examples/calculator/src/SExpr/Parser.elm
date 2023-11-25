@@ -46,6 +46,9 @@ atom =
                     "mod" ->
                         Mod
 
+                    "exp" ->
+                        Exp
+
                     _ ->
                         -- We are guaranteed that s is one of the above values
                         -- and so we can return whatever we want here.
@@ -56,7 +59,7 @@ atom =
 
 chompAtom : Parser ()
 chompAtom =
-    [ "abs", "negate", "add", "sub", "mul", "div", "mod" ]
+    [ "abs", "negate", "add", "sub", "mul", "div", "mod", "exp" ]
         |> List.map P.keyword
         |> P.oneOf
 
