@@ -1,4 +1,4 @@
-module SExpr.Parser exposing (atom, integer, sexpr)
+module SExpr.Parser exposing (atom, integer, list, sexpr)
 
 import Integer as Z exposing (Integer)
 import Parser as P exposing ((|.), (|=), Parser)
@@ -10,12 +10,16 @@ sexpr =
     P.oneOf
         [ P.map Atom atom
         , P.map Number integer
-        , P.map List <|
-            P.succeed identity
-                |. symbol "("
-                |= many (P.lazy (\_ -> sexpr))
-                |. symbol ")"
+        , P.map List list
         ]
+
+
+list : Parser (List SExpr)
+list =
+    P.succeed identity
+        |. symbol "("
+        |= many (P.lazy (\_ -> sexpr))
+        |. symbol ")"
 
 
 atom : Parser Atom
