@@ -1,8 +1,16 @@
-module SExpr.Parser exposing (atom, integer, list, sexpr)
+module SExpr.Parser exposing (atom, input, integer, list, sexpr)
 
 import Integer as Z exposing (Integer)
 import Parser as P exposing ((|.), (|=), Parser)
 import SExpr.AST exposing (..)
+
+
+input : Parser SExpr
+input =
+    P.succeed identity
+        |. P.spaces
+        |= sexpr
+        |. P.end
 
 
 sexpr : Parser SExpr
