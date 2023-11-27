@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator</title>
+
+  <style>
+    body {
+      max-width: 740px;
+      line-height: 1.3;
+    }
+
+    output > p {
+      background-color: gray;
+      padding: 10px;
+    }
+
+    output > p.success {
+      background-color: green;
+      color: white;
+    }
+
+    output > p.error {
+      background-color: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="calculator"></div>
+  <script src="./calculator.js"></script>
+  <script>
+    Elm.Main.init({
+      node: document.getElementById("calculator")
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+# USAGE: [web_root=path] [optimize_js=0|1|2|3] build-examples-calculator
+
+set -e
+
+project="${project:?}/examples/calculator"
+build="${build:?}/examples/calculator"
+
+src_dir="$project"
+web_root="${web_root%/}"
+dest_dir="$build$web_root"
+
+clean () {
+  rm -rf "$build"
+}
+
+prepare_dest_dir () {
+  mkdir -p "$dest_dir"
+}
+
+build_html () {
+  cp "$src_dir"/html/*.html "$dest_dir"
+}
+
+build_js () {
+  case "${optimize_js:-0}" in
+    1|2|3)
+      func=build_js_optimize_"$optimize_js"
+      ;;
+    *)
+      func=build_js_debug
+      ;;
+  esac
+
+  "$func" "$project/src/Main.elm" "$dest_dir/calculator.js"
+}
+
+build_js_debug () {
+  elm make "$1" --debug --output "$2"
+}
+
+build_js_optimize_1 () {
+  elm make "$1" --optimize --output "$2"
+  minify "$2"
+}
+
+build_js_optimize_2 () {
+  elm-optimize-level-2 "$1" --output "$2"
+  minify "$2"
+}
+
+build_js_optimize_3 () {
+  elm-optimize-level-2 "$1" --optimize-speed --output "$2"
+  minify "$2"
+}
+
+minify () {
+  js="$1"
+  min="${js%.js}.min.js"
+
+  terser "$js" --compress 'pure_funcs="F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9",pure_getters,keep_fargs=false,unsafe_comps,unsafe' | terser --mangle --output "$min"
+  mv "$min" "$js"
+}
+
+cd "$project" && clean && prepare_dest_dir && build_html && build_js

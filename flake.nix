@@ -22,11 +22,13 @@
             elm-optimize-level-2
             elm-test
             pkgs.caddy
+            pkgs.nodePackages.terser
           ];
 
           shellHook =
             ''
             export project="$PWD"
+            export build="$project/.build"
             export PATH="$project/bin:$PATH"
             '';
         };
