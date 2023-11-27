@@ -4,6 +4,7 @@ import Browser as B
 import Data.Base as Base exposing (Base)
 import Html as H
 import Html.Attributes as HA
+import Html.Events as HE
 import Integer as Z exposing (Integer)
 import SExpr.Evaluator as E
 
@@ -70,25 +71,25 @@ init =
 
 
 type Msg
-    = NoOp
+    = ChangedInput String
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        NoOp ->
-            model
+        ChangedInput newInput ->
+            { model | input = newInput }
 
 
 
 -- VIEW
 
 
-view : Model -> H.Html msg
+view : Model -> H.Html Msg
 view { input, previousBaseBBase, format, maybeResult } =
     H.div []
         [ viewIntroSection
-        , viewInputSection
+        , viewInputSection input
         , viewOutputOptionsSection previousBaseBBase format
         , viewOutputSection format maybeResult
         ]
@@ -114,8 +115,8 @@ viewIntroSection =
         ]
 
 
-viewInputSection : H.Html msg
-viewInputSection =
+viewInputSection : String -> H.Html Msg
+viewInputSection input =
     let
         cfg =
             """
@@ -153,8 +154,9 @@ viewInputSection =
             [ HA.rows 10
             , HA.cols 80
             , HA.placeholder "(add 1 0b10 (negate (sub 5 0O10)) (abs -0B100) (div 0xC8 0o50))"
+            , HE.onInput ChangedInput
             ]
-            []
+            [ H.text input ]
         , H.p []
             [ H.button [] [ H.text "Calculate!" ] ]
         ]
