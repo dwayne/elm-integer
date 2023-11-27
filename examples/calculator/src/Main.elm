@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Browser as B
 import Data.Base as Base exposing (Base)
 import Html as H
 import Html.Attributes as HA
@@ -7,20 +8,89 @@ import Integer as Z exposing (Integer)
 import SExpr.Evaluator as E
 
 
-main : H.Html msg
+main : Program () Model Msg
 main =
-    let
-        previousBaseBBase =
-            Base.twenty
+    B.sandbox
+        { init = init
+        , view = view
+        , update = update
+        }
 
-        format =
-            Decimal
-    in
+
+
+-- MODEL
+
+
+type alias Model =
+    { input : String
+    , previousBaseBBase : Base
+    , format : Format
+    , maybeResult : Maybe (Result E.Error Integer)
+    }
+
+
+type Format
+    = Decimal
+    | Binary
+    | Octal
+    | Hex
+    | BaseB Base
+
+
+formatToInt : Format -> Int
+formatToInt format =
+    case format of
+        Decimal ->
+            10
+
+        Binary ->
+            2
+
+        Octal ->
+            8
+
+        Hex ->
+            16
+
+        BaseB base ->
+            Base.toInt base
+
+
+init : Model
+init =
+    { input = ""
+    , previousBaseBBase = Base.twenty
+    , format = Decimal
+    , maybeResult = Nothing
+    }
+
+
+
+-- UPDATE
+
+
+type Msg
+    = NoOp
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        NoOp ->
+            model
+
+
+
+-- VIEW
+
+
+view : Model -> H.Html msg
+view { input, previousBaseBBase, format, maybeResult } =
     H.div []
         [ viewIntroSection
         , viewInputSection
         , viewOutputOptionsSection previousBaseBBase format
-        , viewOutputSection format Nothing
+        , viewOutputSection format maybeResult
         ]
 
 
@@ -88,33 +158,6 @@ viewInputSection =
         , H.p []
             [ H.button [] [ H.text "Calculate!" ] ]
         ]
-
-
-type Format
-    = Decimal
-    | Binary
-    | Octal
-    | Hex
-    | BaseB Base
-
-
-formatToInt : Format -> Int
-formatToInt format =
-    case format of
-        Decimal ->
-            10
-
-        Binary ->
-            2
-
-        Octal ->
-            8
-
-        Hex ->
-            16
-
-        BaseB base ->
-            Base.toInt base
 
 
 viewOutputOptionsSection : Base -> Format -> H.Html msg
