@@ -1,4 +1,4 @@
-module Data.Base exposing (Base, fromInt, toInt, twenty)
+module Data.Base exposing (Base, fromInt, fromString, toInt, twenty)
 
 
 type Base
@@ -17,6 +17,11 @@ fromInt n =
 
     else
         Nothing
+
+
+fromString : String -> Maybe Base
+fromString =
+    Maybe.andThen fromInt << String.toInt
 
 
 toInt : Base -> Int

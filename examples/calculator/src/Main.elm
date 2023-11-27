@@ -6,6 +6,7 @@ import Html as H
 import Html.Attributes as HA
 import Html.Events as HE
 import Integer as Z exposing (Integer)
+import Json.Decode as JD
 import SExpr.Evaluator as E
 
 
@@ -24,7 +25,7 @@ main =
 
 type alias Model =
     { input : String
-    , previousBaseBBase : Base
+    , baseBBase : Base
     , format : Format
     , maybeResult : Maybe (Result E.Error Integer)
     }
@@ -60,7 +61,7 @@ formatToInt format =
 init : Model
 init =
     { input = ""
-    , previousBaseBBase = Base.twenty
+    , baseBBase = Base.twenty
     , format = Decimal
     , maybeResult = Nothing
     }
@@ -73,6 +74,8 @@ init =
 type Msg
     = ChangedInput String
     | ClickedCalculate
+    | ChangedFormat Format
+    | ChangedBaseBBase Base
 
 
 update : Msg -> Model -> Model
@@ -91,8 +94,14 @@ update msg model =
 
             else
                 { model
-                | maybeResult = Just <| E.evaluate cleanedInput
+                    | maybeResult = Just <| E.evaluate cleanedInput
                 }
+
+        ChangedFormat newFormat ->
+            { model | format = newFormat }
+
+        ChangedBaseBBase base ->
+            { model | baseBBase = base, format = BaseB base }
 
 
 
@@ -100,11 +109,11 @@ update msg model =
 
 
 view : Model -> H.Html Msg
-view { input, previousBaseBBase, format, maybeResult } =
+view { input, baseBBase, format, maybeResult } =
     H.div []
         [ viewIntroSection
         , viewInputSection input
-        , viewOutputOptionsSection previousBaseBBase format
+        , viewOutputOptionsSection baseBBase format
         , viewOutputSection format maybeResult
         ]
 
@@ -181,67 +190,90 @@ viewInputSection input =
         ]
 
 
-viewOutputOptionsSection : Base -> Format -> H.Html msg
-viewOutputOptionsSection previousBaseBBase format =
+viewOutputOptionsSection : Base -> Format -> H.Html Msg
+viewOutputOptionsSection baseBBase format =
     H.div []
         [ H.h2 [] [ H.text "Output Options" ]
         , H.p [] [ H.text "Select how you would like your integer result to be formatted." ]
-        , viewRadioButtons previousBaseBBase format
+        , viewRadioButtons baseBBase format
         ]
 
 
-viewRadioButtons : Base -> Format -> H.Html msg
-viewRadioButtons previousBaseBBase format =
+viewRadioButtons : Base -> Format -> H.Html Msg
+viewRadioButtons baseBBase format =
     H.div []
         [ viewRadioButton
-            { id = "decimalFormat"
-            , value = "decimal"
-            , isChecked = format == Decimal
-            , text = "Decimal"
+            { selectedFormat = format
+            , currentFormat = Decimal
             }
-            Nothing
         , viewRadioButton
-            { id = "binaryFormat"
-            , value = "binary"
-            , isChecked = format == Binary
-            , text = "Binary"
+            { selectedFormat = format
+            , currentFormat = Binary
             }
-            Nothing
         , viewRadioButton
-            { id = "octalFormat"
-            , value = "octal"
-            , isChecked = format == Octal
-            , text = "Octal"
+            { selectedFormat = format
+            , currentFormat = Octal
             }
-            Nothing
         , viewRadioButton
-            { id = "hexFormat"
-            , value = "hex"
-            , isChecked = format == Hex
-            , text = "Hexadecimal"
+            { selectedFormat = format
+            , currentFormat = Hex
             }
-            Nothing
-        , let
-            ( isChecked, viewSelect ) =
-                case format of
-                    BaseB base ->
-                        ( True, viewBaseBSelect False base )
-
-                    _ ->
-                        ( False, viewBaseBSelect True previousBaseBBase )
-          in
-          viewRadioButton
-            { id = "baseBFormat"
-            , value = "baseB"
-            , isChecked = isChecked
-            , text = "Base "
+        , viewRadioButton
+            { selectedFormat = format
+            , currentFormat = BaseB baseBBase
             }
-            (Just viewSelect)
         ]
 
 
-viewRadioButton : { id : String, value : String, isChecked : Bool, text : String } -> Maybe (H.Html msg) -> H.Html msg
-viewRadioButton { id, value, isChecked, text } maybeHtml =
+viewRadioButton : { selectedFormat : Format, currentFormat : Format } -> H.Html Msg
+viewRadioButton { selectedFormat, currentFormat } =
+    let
+        isChecked =
+            currentFormat == selectedFormat
+
+        { id, value, text, maybeHtml } =
+            case currentFormat of
+                Decimal ->
+                    { id = "decimalFormat"
+                    , value = "decimal"
+                    , text = "Decimal"
+                    , maybeHtml = Nothing
+                    }
+
+                Binary ->
+                    { id = "binaryFormat"
+                    , value = "binary"
+                    , text = "Binary"
+                    , maybeHtml = Nothing
+                    }
+
+                Octal ->
+                    { id = "octalFormat"
+                    , value = "octal"
+                    , text = "Octal"
+                    , maybeHtml = Nothing
+                    }
+
+                Hex ->
+                    { id = "hexFormat"
+                    , value = "hex"
+                    , text = "Hexadecimal"
+                    , maybeHtml = Nothing
+                    }
+
+                BaseB base ->
+                    { id = "baseBFormat"
+                    , value = "baseB"
+                    , text = "Base "
+                    , maybeHtml =
+                        Just <|
+                            if isChecked then
+                                viewBaseBSelect False base
+
+                            else
+                                viewBaseBSelect True base
+                    }
+    in
     H.div []
         [ H.input
             [ HA.type_ "radio"
@@ -249,6 +281,7 @@ viewRadioButton { id, value, isChecked, text } maybeHtml =
             , HA.name "format"
             , HA.value value
             , HA.checked isChecked
+            , onFormat (ChangedFormat currentFormat)
             ]
             []
         , H.label [ HA.for id ] [ H.text text ]
@@ -257,20 +290,51 @@ viewRadioButton { id, value, isChecked, text } maybeHtml =
         ]
 
 
-viewBaseBSelect : Bool -> Base -> H.Html msg
+onFormat : msg -> H.Attribute msg
+onFormat msg =
+    HE.on "input" (JD.succeed msg)
+
+
+viewBaseBSelect : Bool -> Base -> H.Html Msg
 viewBaseBSelect isDisabled base =
     let
         selectedB =
             Base.toInt base
+
+        attrs =
+            if isDisabled then
+                [ HA.disabled True ]
+
+            else
+                [ onBaseBBase ChangedBaseBBase ]
     in
-    H.select [ HA.disabled isDisabled ] <|
+    H.select attrs <|
         List.map
             (\b ->
                 H.option
-                    [ HA.selected <| b == selectedB ]
+                    [ HA.selected <| b == selectedB
+                    ]
                     [ H.text <| String.fromInt b ]
             )
             (List.range 2 36)
+
+
+onBaseBBase : (Base -> msg) -> H.Attribute msg
+onBaseBBase toMsg =
+    let
+        decoder =
+            HE.targetValue
+                |> JD.andThen
+                    (\s ->
+                        case Base.fromString s of
+                            Just base ->
+                                JD.succeed <| toMsg base
+
+                            Nothing ->
+                                JD.fail <| "Expected an positive integer between 2 and 36 inclusive: " ++ s
+                    )
+    in
+    HE.on "input" decoder
 
 
 viewOutputSection : Format -> Maybe (Result E.Error Integer) -> H.Html msg
