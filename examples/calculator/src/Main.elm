@@ -72,6 +72,7 @@ init =
 
 type Msg
     = ChangedInput String
+    | ClickedCalculate
 
 
 update : Msg -> Model -> Model
@@ -79,6 +80,19 @@ update msg model =
     case msg of
         ChangedInput newInput ->
             { model | input = newInput }
+
+        ClickedCalculate ->
+            let
+                cleanedInput =
+                    String.trim model.input
+            in
+            if String.isEmpty cleanedInput then
+                model
+
+            else
+                { model
+                | maybeResult = Just <| E.evaluate cleanedInput
+                }
 
 
 
@@ -158,7 +172,12 @@ viewInputSection input =
             ]
             [ H.text input ]
         , H.p []
-            [ H.button [] [ H.text "Calculate!" ] ]
+            [ H.button
+                [ HA.disabled (String.isEmpty <| String.trim input)
+                , HE.onClick ClickedCalculate
+                ]
+                [ H.text "Calculate!" ]
+            ]
         ]
 
 
