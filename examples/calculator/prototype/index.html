@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator</title>
+
+  <style>
+    body {
+      max-width: 740px;
+      line-height: 1.3;
+    }
+
+    output > p {
+      background-color: gray;
+      padding: 10px;
+    }
+
+    output > p.success {
+      background-color: green;
+      color: white;
+    }
+
+    output > p.error {
+      background-color: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Calculator</h1>
+
+  <p>
+    This is a simple <a href="https://en.wikipedia.org/wiki/Integer">integer</a> calculator built upon the
+    <a href="https://github.com/dwayne/elm-integer">elm-integer</a> library. It's designed to make it easy
+    to test out all the <strong>integer input formats</strong>, <strong>arithmetic operations</strong>, and
+    <strong>integer output formats</strong> that's supported by the library.
+  </p>
+
+  <h2>Input</h2>
+
+  <p>You can enter your expression using an <a href="https://en.wikipedia.org/wiki/S-expression">S-expression</a> based language.</p>
+
+  <p>The following syntax is supported:</p>
+
+  <pre>
+    Expr      ::= Integer
+                | '(' 'abs' Expr ')'
+                | '(' 'negate' Expr ')'
+                | '(' 'add' Expr* ')'
+                | '(' 'sub' Expr Expr ')'
+                | '(' 'mul' Expr* ')'
+                | '(' 'div' Expr Expr ')'
+                | '(' 'mod' Expr Expr ')'
+                | '(' 'exp' Expr Expr ')'
+    Integer   ::= Sign Magnitude
+    Sign      ::= '-'?
+    Magnitude ::= ('0b' | '0B') Binary
+                | ('0o' | '0O') Octal
+                | ('0x' | '0X') Hex
+                | Decimal
+    Binary    ::= [0-1]+
+    Octal     ::= [0-7]+
+    Hex       ::= [0-9a-fA-F]+
+    Decimal   ::= [0-9]+
+  </pre>
+
+  <textarea rows="10" cols="80" placeholder="(add 1 0b10 (negate (sub 5 0O10)) (abs -0B100) (div 0xC8 0o50))"></textarea>
+
+  <p>
+    <button>Calculate!</button>
+  </p>
+
+  <h2>Output Options</h2>
+
+  <p>Select how you would like your integer result to be formatted.</p>
+
+  <div>
+    <div>
+      <input type="radio" id="decimalFormat" name="format" value="decimal" checked />
+      <label for="decimalFormat">Decimal</label>
+    </div>
+
+    <div>
+      <input type="radio" id="binaryFormat" name="format" value="binary" />
+      <label for="binaryFormat">Binary</label>
+    </div>
+
+    <div>
+      <input type="radio" id="octalFormat" name="format" value="octal" />
+      <label for="octalFormat">Octal</label>
+    </div>
+
+    <div>
+      <input type="radio" id="hexFormat" name="format" value="hex" />
+      <label for="hexFormat">Hexadecimal</label>
+    </div>
+
+    <div>
+      <input type="radio" id="baseBFormat" name="format" value="baseB" />
+      <label for="baseBFormat">Base</label>
+      <!-- NOTE: The select element should be disabled when the corresponding
+                 radio button isn't checked.
+
+                 i.e. <select disabled>...</select>
+      -->
+      <select>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+        <option>7</option>
+        <option>8</option>
+        <option>9</option>
+        <option>10</option>
+        <option>11</option>
+        <option>12</option>
+        <option>13</option>
+        <option>14</option>
+        <option>15</option>
+        <option>16</option>
+        <option>17</option>
+        <option>18</option>
+        <option>19</option>
+        <option selected>20</option>
+        <option>21</option>
+        <option>22</option>
+        <option>23</option>
+        <option>24</option>
+        <option>25</option>
+        <option>26</option>
+        <option>27</option>
+        <option>28</option>
+        <option>29</option>
+        <option>30</option>
+        <option>31</option>
+        <option>32</option>
+        <option>33</option>
+        <option>34</option>
+        <option>35</option>
+        <option>36</option>
+      </select>
+    </div>
+  </div>
+
+  <h2>Output</h2>
+
+  <output>
+    <!-- NOTE: .success and .error can be applied to p element. -->
+    <p>
+      The result of your calculation will appear here.
+    </p>
+  </output>
+</body>
+</html>

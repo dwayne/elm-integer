@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+project="${project:?}"
+port="${1:-8000}"
+
+caddy file-server --debug --listen :"$port" --root "$project/examples/calculator/prototype"

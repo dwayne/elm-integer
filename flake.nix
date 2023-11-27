@@ -21,6 +21,7 @@
             elm-format
             elm-optimize-level-2
             elm-test
+            pkgs.caddy
           ];
 
           shellHook =
