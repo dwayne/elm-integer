@@ -6,7 +6,7 @@ module Integer exposing
     , fromSafeInt, fromInt, fromNatural, fromSafeString, fromString, fromBinaryString, fromOctalString, fromDecimalString, fromHexString, fromBaseBString
     , compare, isLessThan, isLessThanOrEqual, isGreaterThan, isGreaterThanOrEqual, max, min
     , isNegative, isNonNegative, isZero, isNonZero, isPositive, isNonPositive, isEven, isOdd
-    , abs, negate, add, sub, mul, divModBy, divBy, modBy, exp
+    , abs, negate, add, sub, mul, divModBy, divBy, modBy, quotRemBy, quotBy, remBy, exp
     , toInt, toNatural, toString, toBinaryString, toOctalString, toDecimalString, toHexString, toBaseBString
     )
 
@@ -58,7 +58,7 @@ For all other comparisons you will have to use the functions below.
 
 # Arithmetic
 
-@docs abs, negate, add, sub, mul, divModBy, divBy, modBy, exp
+@docs abs, negate, add, sub, mul, divModBy, divBy, modBy, quotRemBy, quotBy, remBy, exp
 
 
 # Conversion
@@ -1124,11 +1124,13 @@ mul x y =
 
 
 {-| Find the quotient and remainder when the second integer is divided by the first.
-This is called [Euclidean division](https://en.wikipedia.org/wiki/Euclidean_division)
+
+This operation performs [Euclidean division](https://en.wikipedia.org/wiki/Euclidean_division)
 or **division with remainder**.
 
-We define the Euclidean division of two integers `D` (the dividend) and `d ≠ 0` (the divisor),
-as producing two integers `q` (the quotient) and `r` (the remainder) such that
+`divModBy d D` of two integers `D` (the dividend) and `d ≠ 0` (the divisor),
+is defined as producing two unique integers `q` (the quotient) and `r` (the remainder)
+such that
 
   - `d * q` is the greatest multiple of `d` less than or equal to `D`, and
   - `r = D - d * q` (which implies `r` is always non-negative).
@@ -1172,7 +1174,7 @@ Division by `0` is not allowed. So, for all `z : Integer`,
     (z |> divModBy zero) == Nothing
 
 **N.B.** _This [Euclidean division article by Probabilistic World](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/)
-is well written and can help you understand the operation in greater depth._
+is well written and can help you understand `divModBy` in greater depth._
 
 -}
 divModBy : Integer -> Integer -> Maybe ( Integer, Integer )
@@ -1276,6 +1278,161 @@ divBy divisor dividend =
 modBy : Integer -> Integer -> Maybe Integer
 modBy divisor dividend =
     divModBy divisor dividend
+        |> Maybe.map Tuple.second
+
+
+{-| Find the quotient and remainder when the second integer is divided by the first.
+
+`quotRemBy d D` of two integers `D` (the dividend) and `d ≠ 0` (the divisor),
+is defined as producing two unique integers `q` (the quotient) and `r` (the remainder)
+such that
+
+  - `|d * q|` is the greatest multiple of `d` less than or equal to `|D|`, and
+  - `r = D - d * q` (which implies `0 <= |r| < |d|`, i.e. `r` can be negative).
+
+For e.g.
+
+    (ten |> quotRemBy two) == Just (five, zero)
+    -- Because |2 * 5| is the greatest multiple of 2 less than or equal to |10|,
+    -- and 0 = 10 - (2 * 5).
+
+    (ten |> quotRemBy negativeTwo) == Just (negativeFive, zero)
+    -- Because |-2 * -5| is the greatest multiple of -2 less than or equal to |10|,
+    -- and 0 = 10 - (-2 * -5).
+
+    (negativeTen |> quotRemBy two) == Just (negativeFive, zero)
+    -- Because |2 * -5| is the greatest multiple of 2 less than or equal to |-10|,
+    -- and 0 = -10 - (2 * -5).
+
+    (negativeTen |> quotRemBy negativeTwo) == Just (five, zero)
+    -- Because |-2 * 5| is the greatest multiple of -2 less than or equal to |-10|,
+    -- and 0 = -10 - (-2 * 5).
+
+    (ten |> quotRemBy three) == Just (three, one)
+    -- Because |3 * 3| is the greatest multiple of 3 less than or equal to |10|,
+    -- and 1 = 10 - (3 * 3).
+
+    (ten |> quotRemBy negativeThree) == Just (negativeThree, one)
+    -- Because |-3 * -3| is the greatest multiple of -3 less than or equal to |10|,
+    -- and 1 = 10 - (-3 * -3).
+
+    (negativeTen |> quotRemBy three) == Just (negativeThree, negativeOne)
+    -- Because |3 * -3| is the greatest multiple of 3 less than or equal to |-10|,
+    -- and -1 = -10 - (3 * -3).
+
+    (negativeTen |> quotRemBy negativeThree) == Just (three, negativeOne)
+    -- Because |-3 * 3| is the greatest multiple of -3 less than or equal to |-10|,
+    -- and -1 = -10 - (-3 * 3).
+
+Division by `0` is not allowed. So, for all `z : Integer`,
+
+    (z |> quotRemBy zero) == Nothing
+
+**N.B.** _This [Euclidean division article by Probabilistic World](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/)
+is well written and can help you understand `quotRemBy` in greater depth._
+
+-}
+quotRemBy : Integer -> Integer -> Maybe ( Integer, Integer )
+quotRemBy divisor dividend =
+    case ( divisor, dividend ) of
+        ( Zero, _ ) ->
+            --
+            -- Division by 0 is undefined.
+            --
+            Nothing
+
+        ( _, Zero ) ->
+            --
+            -- Anything divided by 0 is 0.
+            --
+            Just ( zero, zero )
+
+        ( Positive b, Positive a ) ->
+            --
+            -- 10 = 2 * 5 + 0
+            --
+            -- 10 = 3 * 3 + 1
+            --
+            N.divModBy b a
+                |> Maybe.map (Tuple.mapBoth fromNatural fromNatural)
+
+        ( Negative b, Positive a ) ->
+            --
+            -- 10 = -2 * -5 + 0
+            --
+            -- 10 = -3 * -3 + 1
+            --
+            N.divModBy b a
+                |> Maybe.map (Tuple.mapBoth (negate << fromNatural) fromNatural)
+
+        ( Positive b, Negative a ) ->
+            --
+            -- -10 = 2 * -5 + 0
+            --
+            -- -10 = 3 * -3 - 1
+            --
+            N.divModBy b a
+                |> Maybe.map
+                    (\( q, r ) ->
+                        if N.isZero r then
+                            ( q
+                                |> fromNatural
+                                |> negate
+                            , r
+                                |> fromNatural
+                            )
+
+                        else
+                            ( q
+                                |> fromNatural
+                                |> negate
+                            , r
+                                |> fromNatural
+                                |> negate
+                            )
+                    )
+
+        ( Negative b, Negative a ) ->
+            --
+            -- -10 = -2 * 5 + 0
+            --
+            -- -10 = -3 * 3 - 1
+            --
+            N.divModBy b a
+                |> Maybe.map
+                    (\( q, r ) ->
+                        if N.isZero r then
+                            ( fromNatural q, fromNatural r )
+
+                        else
+                            ( q
+                                |> fromNatural
+                            , r
+                                |> fromNatural
+                                |> negate
+                            )
+                    )
+
+
+{-| Find the quotient when the second integer is divided by the first.
+
+**N.B.** _Please see [`quotRemBy`](#quotRemBy) to understand how `quotBy` works._
+
+-}
+quotBy : Integer -> Integer -> Maybe Integer
+quotBy divisor dividend =
+    quotRemBy divisor dividend
+        |> Maybe.map Tuple.first
+
+
+{-| Find the remainder when the second integer is divided by the first.
+
+**N.B.** _Please see [`quotRemBy`](#quotRemBy) to understand how `remBy` works._
+
+-}
+remBy : Integer -> Integer -> Maybe Integer
+remBy divisor dividend =
+    quotRemBy divisor dividend
         |> Maybe.map Tuple.second
 
 

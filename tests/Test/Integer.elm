@@ -28,6 +28,7 @@ suite =
         , subtractionSuite
         , multiplicationSuite
         , euclideanDivisionSuite
+        , quotRemBySuite
         , exponentiationSuite
         ]
 
@@ -718,6 +719,63 @@ euclideanDivisionSuite =
                     Just ( q, r ) ->
                         ( bigD
                         , (r |> Z.isGreaterThanOrEqual Z.zero) && (r |> Z.isLessThan (Z.abs d))
+                        )
+                            |> Expect.equal
+                                ( Z.add (Z.mul d q) r
+                                , True
+                                )
+
+                    Nothing ->
+                        Z.isZero d
+                            |> Expect.equal True
+        ]
+
+
+quotRemBySuite : Test
+quotRemBySuite =
+    describe "quotRemBy"
+        [ test "10 ÷ 2" <|
+            \_ ->
+                (Z.ten |> Z.quotRemBy Z.two)
+                    |> Expect.equal (Just ( Z.five, Z.zero ))
+        , test "10 ÷ (-2)" <|
+            \_ ->
+                (Z.ten |> Z.quotRemBy Z.negativeTwo)
+                    |> Expect.equal (Just ( Z.negativeFive, Z.zero ))
+        , test "(-10) ÷ 2" <|
+            \_ ->
+                (Z.negativeTen |> Z.quotRemBy Z.two)
+                    |> Expect.equal (Just ( Z.negativeFive, Z.zero ))
+        , test "(-10) ÷ (-2)" <|
+            \_ ->
+                (Z.negativeTen |> Z.quotRemBy Z.negativeTwo)
+                    |> Expect.equal (Just ( Z.five, Z.zero ))
+        , test "10 ÷ 3" <|
+            \_ ->
+                (Z.ten |> Z.quotRemBy Z.three)
+                    |> Expect.equal (Just ( Z.three, Z.one ))
+        , test "10 ÷ (-3)" <|
+            \_ ->
+                (Z.ten |> Z.quotRemBy Z.negativeThree)
+                    |> Expect.equal (Just ( Z.negativeThree, Z.one ))
+        , test "(-10) ÷ 3" <|
+            \_ ->
+                (Z.negativeTen |> Z.quotRemBy Z.three)
+                    |> Expect.equal (Just ( Z.negativeThree, Z.negativeOne ))
+        , test "(-10) ÷ (-3)" <|
+            \_ ->
+                (Z.negativeTen |> Z.quotRemBy Z.negativeThree)
+                    |> Expect.equal (Just ( Z.three, Z.negativeOne ))
+        , fuzz2 integer integer "∀ D ∊ ℤ, d ∊ ℤ - {0}, D = d * q + r where q ∊ ℤ and 0 ≤ |r| < |d|" <|
+            \bigD d ->
+                case bigD |> Z.quotRemBy d of
+                    Just ( q, r ) ->
+                        ( bigD
+                        , let
+                            absR =
+                                Z.abs r
+                          in
+                          (absR |> Z.isGreaterThanOrEqual Z.zero) && (absR |> Z.isLessThan (Z.abs d))
                         )
                             |> Expect.equal
                                 ( Z.add (Z.mul d q) r

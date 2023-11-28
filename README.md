@@ -78,6 +78,9 @@ A pure Elm library for computing with the [integers](https://en.wikipedia.org/wi
 - `divModBy` (Euclidean division)
 - `divBy`
 - `modBy`
+- `quotRemBy` (differs from `divModBy` in its handling of negative operands)
+- `quotBy`
+- `remBy`
 - `exp`
 
 ### Ways to convert to an `Int` or a [`Natural`][Natural]
