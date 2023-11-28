@@ -23,6 +23,7 @@
             elm-test
             pkgs.caddy
             pkgs.nodePackages.terser
+            pkgs.shellcheck
           ];
 
           shellHook =
