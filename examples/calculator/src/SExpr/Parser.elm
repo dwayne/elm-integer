@@ -58,6 +58,12 @@ atom =
                     "mod" ->
                         Mod
 
+                    "quot" ->
+                        Quot
+
+                    "rem" ->
+                        Rem
+
                     "exp" ->
                         Exp
 
@@ -71,7 +77,7 @@ atom =
 
 chompAtom : Parser ()
 chompAtom =
-    [ "abs", "negate", "add", "sub", "mul", "div", "mod", "exp" ]
+    [ "abs", "negate", "add", "sub", "mul", "div", "mod", "quot", "rem", "exp" ]
         |> List.map P.keyword
         |> P.oneOf
 

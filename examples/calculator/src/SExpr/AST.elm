@@ -17,4 +17,6 @@ type Atom
     | Mul
     | Div
     | Mod
+    | Quot
+    | Rem
     | Exp

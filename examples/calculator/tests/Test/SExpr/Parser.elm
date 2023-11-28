@@ -36,6 +36,10 @@ atomSuite =
             , ( "divide", Nothing )
             , ( "mod", Just Mod )
             , ( "%", Nothing )
+            , ( "quot", Just Quot )
+            , ( "quotient", Nothing )
+            , ( "rem", Just Rem )
+            , ( "remainder", Nothing )
             , ( "exp", Just Exp )
             , ( "pow", Nothing )
             ]

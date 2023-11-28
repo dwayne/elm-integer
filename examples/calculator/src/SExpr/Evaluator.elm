@@ -88,6 +88,12 @@ evaluateOp atom =
         Mod ->
             call mod (Fixed 2)
 
+        Quot ->
+            call quot (Fixed 2)
+
+        Rem ->
+            call rem (Fixed 2)
+
         Exp ->
             call exp (Fixed 2)
 
@@ -215,6 +221,28 @@ mod args =
     case args of
         [ x, y ] ->
             Z.modBy y x
+                |> Result.fromMaybe DivisionByZero
+
+        _ ->
+            Err InternalError
+
+
+quot : List Integer -> Result RuntimeError Integer
+quot args =
+    case args of
+        [ x, y ] ->
+            Z.quotBy y x
+                |> Result.fromMaybe DivisionByZero
+
+        _ ->
+            Err InternalError
+
+
+rem : List Integer -> Result RuntimeError Integer
+rem args =
+    case args of
+        [ x, y ] ->
+            Z.remBy y x
                 |> Result.fromMaybe DivisionByZero
 
         _ ->

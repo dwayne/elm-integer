@@ -151,6 +151,8 @@ viewInputSection input =
                 | '(' 'mul' Expr* ')'
                 | '(' 'div' Expr Expr ')'
                 | '(' 'mod' Expr Expr ')'
+                | '(' 'quot' Expr Expr ')'
+                | '(' 'rem' Expr Expr ')'
                 | '(' 'exp' Expr Expr ')'
     Integer   ::= Sign Magnitude
     Sign      ::= '-'?

@@ -1133,7 +1133,7 @@ is defined as producing two unique integers `q` (the quotient) and `r` (the rema
 such that
 
   - `d * q` is the greatest multiple of `d` less than or equal to `D`, and
-  - `r = D - d * q` (which implies `r` is always non-negative).
+  - `r = D - d * q` such that `0 <= r < |d|` (i.e. `r` is always non-negative).
 
 For e.g.
 
@@ -1288,7 +1288,7 @@ is defined as producing two unique integers `q` (the quotient) and `r` (the rema
 such that
 
   - `|d * q|` is the greatest multiple of `d` less than or equal to `|D|`, and
-  - `r = D - d * q` (which implies `0 <= |r| < |d|`, i.e. `r` can be negative).
+  - `r = D - d * q` such that `0 <= |r| < |d|` (i.e. `r` can be negative).
 
 For e.g.
 
