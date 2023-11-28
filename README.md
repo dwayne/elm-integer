@@ -101,7 +101,60 @@ A pure Elm library for computing with the [integers](https://en.wikipedia.org/wi
 
 ## Examples
 
-TODO
+### Calculator
+
+In the `examples/calculator` directory you will find the implementation of a simple integer calculator web application. The calculator
+is designed and built to make it easy to test out all the **integer input formats**, **arithmetic operations**, and
+**integer output formats** that's supported by this library.
+
+You are able to enter your expression using an [S-expression](https://en.wikipedia.org/wiki/S-expression) based language. The
+following syntax is supported:
+
+```txt
+Expr      ::= Integer
+            | '(' 'abs' Expr ')'
+            | '(' 'negate' Expr ')'
+            | '(' 'add' Expr* ')'
+            | '(' 'sub' Expr Expr ')'
+            | '(' 'mul' Expr* ')'
+            | '(' 'div' Expr Expr ')'
+            | '(' 'mod' Expr Expr ')'
+            | '(' 'quot' Expr Expr ')'
+            | '(' 'rem' Expr Expr ')'
+            | '(' 'exp' Expr Expr ')'
+Integer   ::= Sign Magnitude
+Sign      ::= '-'?
+Magnitude ::= ('0b' | '0B') Binary
+            | ('0o' | '0O') Octal
+            | ('0x' | '0X') Hex
+            | Decimal
+Binary    ::= [0-1]+
+Octal     ::= [0-7]+
+Hex       ::= [0-9a-fA-F]+
+Decimal   ::= [0-9]+
+```
+
+**N.B.** *You must be in the Nix development shell (`nix develop`) to run the scripts mentioned below.*
+
+#### Run tests
+
+```sh
+test-examples-calculator
+```
+
+#### Build
+
+```sh
+build-examples-calculator
+```
+
+#### Serve
+
+```sh
+serve-examples-calculator
+```
+
+Then, open `http://localhost:8000` in your browser to use the web application.
 
 ## Performance
 
