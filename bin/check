@@ -32,6 +32,7 @@ build-integer () {
 }
 
 if ! (build-integer &>/dev/null); then
+  echo "Build failed for build-integer!"
   build-integer
 fi
 
@@ -42,9 +43,16 @@ fi
 # Calculator
 
 if ! (build-examples-calculator &>/dev/null); then
+  echo "Build failed for build-examples-calculator!"
   build-examples-calculator
 fi
 
 if ! (test-examples-calculator &>/dev/null); then
   fail "One or more tests failed. Run: test-examples-calculator"
+fi
+
+# Review
+
+if ! review &>/dev/null; then
+  fail "One or more reviews failed. Run: review"
 fi

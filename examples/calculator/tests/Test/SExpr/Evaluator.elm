@@ -2,7 +2,7 @@ module Test.SExpr.Evaluator exposing (suite)
 
 import Expect
 import Integer as Z exposing (Integer)
-import SExpr.AST exposing (..)
+import SExpr.AST exposing (Atom(..), SExpr(..))
 import SExpr.Evaluator as E
 import Test exposing (Test, describe, test)
 

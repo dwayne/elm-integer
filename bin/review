@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 #
-# Usage: format [args-for-elm-format]
+# Usage: review [args-for-elm-review]
 #
 
 set -euo pipefail
 
 cd "${project:?}" &&                \
-  elm-format                        \
+  npx elm-review                    \
     examples/calculator/{src,tests} \
     review/src                      \
     src                             \
     tests                           \
-    "${@:---yes}"
+    "$@"

@@ -2,7 +2,7 @@
   description = "A developer shell for working on elm-integer.";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=23.05";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=23.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -22,6 +22,7 @@
             elm-optimize-level-2
             elm-test
             pkgs.caddy
+            pkgs.nodejs_20
             pkgs.nodePackages.terser
             pkgs.shellcheck
           ];
@@ -31,6 +32,8 @@
             export project="$PWD"
             export build="$project/.build"
             export PATH="$project/bin:$PATH"
+
+            npm install --loglevel silent
             '';
         };
       }

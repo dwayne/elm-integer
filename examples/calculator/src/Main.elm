@@ -398,7 +398,7 @@ errorToString e =
                     "Expected an integer."
 
                 E.ArityError expectation given ->
-                    String.join ""
+                    String.concat
                         [ "Expected "
                         , expectationToString expectation
                         , ", but was given "

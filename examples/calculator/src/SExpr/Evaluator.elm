@@ -6,8 +6,8 @@ module SExpr.Evaluator exposing
     )
 
 import Integer as Z exposing (Integer)
-import Parser as P exposing (DeadEnd)
-import SExpr.AST exposing (..)
+import Parser exposing (DeadEnd, run)
+import SExpr.AST exposing (Atom(..), SExpr(..))
 import SExpr.Parser as P
 
 
@@ -32,7 +32,7 @@ type Expectation
 
 evaluate : String -> Result Error Integer
 evaluate input =
-    case P.run P.input input of
+    case run P.input input of
         Ok sexpr ->
             evaluateSExpr sexpr
                 |> Result.mapError RuntimeError
@@ -138,10 +138,7 @@ evaluateArgs sexprs =
                 |> Result.andThen
                     (\z ->
                         evaluateArgs restSExprs
-                            |> Result.andThen
-                                (\zs ->
-                                    Ok <| z :: zs
-                                )
+                            |> Result.map ((::) z)
                     )
 
 

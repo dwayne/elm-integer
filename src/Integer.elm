@@ -388,7 +388,7 @@ If `b = 16` then the valid base-16 digits are `[0-9a-fA-F]`.
 If `b = 36` then the valid base-36 digits are `[0-9a-zA-Z]`.
 
 
-### Syntax
+### Syntax for `fromBaseBString` input
 
 ```txt
 input ::= -? [digit]+
@@ -573,7 +573,7 @@ fromHexString =
 {-| Create the integer represented by the given signed string.
 
 
-### Syntax
+### Syntax for `fromString` input
 
 ```txt
 input    ::= signed
