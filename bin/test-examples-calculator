@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
+#
+# Usage: test-examples-calculator
+#
+
+set -euo pipefail
+
 cd "${project:?}/examples/calculator" && elm-test

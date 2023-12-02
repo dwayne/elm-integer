@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#
+# Usage: check-scripts
+#
+
+set -euo pipefail
+
 project="${project:?}"
 
 shellcheck --norc -xP "$project/bin" "$project"/bin/*

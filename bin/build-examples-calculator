@@ -1,30 +1,32 @@
 #!/usr/bin/env bash
 
-# USAGE: [web_root=path] [optimize_js=0|1|2|3] build-examples-calculator
+#
+# USAGE: [root=path] [optimize_js=0|1|2|3] build-examples-calculator
+#
 
-set -e
+set -euo pipefail
 
-project="${project:?}/examples/calculator"
-build="${build:?}/examples/calculator"
+root="${root:-}"
+optimize_js="${optimize_js:-0}"
 
-src_dir="$project"
-web_root="${web_root%/}"
-dest_dir="$build$web_root"
+src="${project:?}/examples/calculator"
+out="${build:?}/examples/calculator"
+web_root="$out/${root}"
 
 clean () {
-  rm -rf "$build"
+  rm -rf "$out"
 }
 
-prepare_dest_dir () {
-  mkdir -p "$dest_dir"
+prepare_web_root () {
+  mkdir -p "$web_root"
 }
 
 build_html () {
-  cp "$src_dir"/html/*.html "$dest_dir"
+  cp "$src"/html/*.html "$web_root"
 }
 
 build_js () {
-  case "${optimize_js:-0}" in
+  case "${optimize_js}" in
     1|2|3)
       func=build_js_optimize_"$optimize_js"
       ;;
@@ -33,7 +35,7 @@ build_js () {
       ;;
   esac
 
-  "$func" "$project/src/Main.elm" "$dest_dir/calculator.js"
+  "$func" "$src/src/Main.elm" "$web_root/calculator.js"
 }
 
 build_js_debug () {
@@ -63,4 +65,4 @@ minify () {
   mv "$min" "$js"
 }
 
-cd "$project" && clean && prepare_dest_dir && build_html && build_js
+cd "$src" && clean && prepare_web_root && build_html && build_js

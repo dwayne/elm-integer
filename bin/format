@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-cd "${project:?}" && \
-  elm-format         \
-    examples         \
-    src              \
-    tests            \
+#
+# Usage: format [args-for-elm-format]
+#
+
+set -euo pipefail
+
+cd "${project:?}" &&                \
+  elm-format                        \
+    examples/calculator/{src,tests} \
+    src                             \
+    tests                           \
     "${@:---yes}"

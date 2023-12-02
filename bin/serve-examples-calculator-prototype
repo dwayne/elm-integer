@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-project="${project:?}"
+#
+# Usage: serve-examples-calculator-prototype [8000]
+#
+
+set -euo pipefail
+
 port="${1:-8000}"
 
-caddy file-server --debug --listen :"$port" --root "$project/examples/calculator/prototype"
+caddy file-server --listen :"$port" --root "${project:?}/examples/calculator/prototype"
