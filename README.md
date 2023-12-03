@@ -101,7 +101,7 @@ A pure Elm library for computing with the [integers](https://en.wikipedia.org/wi
 
 ## Examples
 
-### Calculator
+### Calculator - [Live Demo](https://dwayne.github.io/elm-integer/)
 
 In the `examples/calculator` directory you will find the implementation of a simple integer calculator web application. The calculator
 is designed and built to make it easy to test out all the **integer input formats**, **arithmetic operations**, and
