@@ -6,8 +6,11 @@
 
 set -euo pipefail
 
-cd "${project:?}" && \
-  rm -rf             \
-    .build           \
-    elm-stuff        \
-    examples/calculator/elm-stuff
+cd "${project:?}" &&              \
+  rm -rf                          \
+    .build                        \
+    elm-stuff                     \
+    examples/calculator/elm-stuff \
+    node_modules
+
+echo "Please restart your Nix development shell"
