@@ -35,91 +35,34 @@ suite =
 
 constantsSuite : Test
 constantsSuite =
+    let
+        expectEqual i z =
+            test (String.fromInt i) <|
+                \_ ->
+                    z |> Expect.equal (Z.fromSafeInt i)
+    in
     describe "constants"
-        [ test "0" <|
-            \_ ->
-                Z.zero
-                    |> Expect.equal (Z.fromSafeInt 0)
-        , test "1" <|
-            \_ ->
-                Z.one
-                    |> Expect.equal (Z.fromSafeInt 1)
-        , test "2" <|
-            \_ ->
-                Z.two
-                    |> Expect.equal (Z.fromSafeInt 2)
-        , test "3" <|
-            \_ ->
-                Z.three
-                    |> Expect.equal (Z.fromSafeInt 3)
-        , test "4" <|
-            \_ ->
-                Z.four
-                    |> Expect.equal (Z.fromSafeInt 4)
-        , test "5" <|
-            \_ ->
-                Z.five
-                    |> Expect.equal (Z.fromSafeInt 5)
-        , test "6" <|
-            \_ ->
-                Z.six
-                    |> Expect.equal (Z.fromSafeInt 6)
-        , test "7" <|
-            \_ ->
-                Z.seven
-                    |> Expect.equal (Z.fromSafeInt 7)
-        , test "8" <|
-            \_ ->
-                Z.eight
-                    |> Expect.equal (Z.fromSafeInt 8)
-        , test "9" <|
-            \_ ->
-                Z.nine
-                    |> Expect.equal (Z.fromSafeInt 9)
-        , test "10" <|
-            \_ ->
-                Z.ten
-                    |> Expect.equal (Z.fromSafeInt 10)
-        , test "-1" <|
-            \_ ->
-                Z.negativeOne
-                    |> Expect.equal (Z.fromSafeInt -1)
-        , test "-2" <|
-            \_ ->
-                Z.negativeTwo
-                    |> Expect.equal (Z.fromSafeInt -2)
-        , test "-3" <|
-            \_ ->
-                Z.negativeThree
-                    |> Expect.equal (Z.fromSafeInt -3)
-        , test "-4" <|
-            \_ ->
-                Z.negativeFour
-                    |> Expect.equal (Z.fromSafeInt -4)
-        , test "-5" <|
-            \_ ->
-                Z.negativeFive
-                    |> Expect.equal (Z.fromSafeInt -5)
-        , test "-6" <|
-            \_ ->
-                Z.negativeSix
-                    |> Expect.equal (Z.fromSafeInt -6)
-        , test "-7" <|
-            \_ ->
-                Z.negativeSeven
-                    |> Expect.equal (Z.fromSafeInt -7)
-        , test "-8" <|
-            \_ ->
-                Z.negativeEight
-                    |> Expect.equal (Z.fromSafeInt -8)
-        , test "-9" <|
-            \_ ->
-                Z.negativeNine
-                    |> Expect.equal (Z.fromSafeInt -9)
-        , test "-10" <|
-            \_ ->
-                Z.negativeTen
-                    |> Expect.equal (Z.fromSafeInt -10)
+        [ Z.negativeTen |> expectEqual -10
+        , Z.negativeNine |> expectEqual -9
+        , Z.negativeEight |> expectEqual -8
+        , Z.negativeSeven |> expectEqual -7
+        , Z.negativeSix |> expectEqual -6
+        , Z.negativeFive |> expectEqual -5
+        , Z.negativeFour |> expectEqual -4
+        , Z.negativeThree |> expectEqual -3
+        , Z.negativeTwo |> expectEqual -2
+        , Z.negativeOne |> expectEqual -1
+        , Z.zero |> expectEqual 0
+        , Z.one |> expectEqual 1
+        , Z.two |> expectEqual 2
+        , Z.three |> expectEqual 3
+        , Z.four |> expectEqual 4
+        , Z.five |> expectEqual 5
+        , Z.six |> expectEqual 6
+        , Z.seven |> expectEqual 7
+        , Z.eight |> expectEqual 8
+        , Z.nine |> expectEqual 9
+        , Z.ten |> expectEqual 10
         ]
 
 
@@ -154,7 +97,7 @@ fromIntSuite =
             \_ ->
                 Z.fromInt (Z.maxSafeInt + 1)
                     |> Expect.equal Nothing
-        , describe "for all safe integers s, toInt (fromInt s) == s"
+        , describe "for all safe Ints, s, toInt (fromInt s) == s"
             [ test "maxSafeInt" <|
                 \_ ->
                     Z.fromInt Z.maxSafeInt
@@ -165,7 +108,7 @@ fromIntSuite =
                     Z.fromInt Z.minSafeInt
                         |> Maybe.map Z.toInt
                         |> Expect.equal (Just Z.minSafeInt)
-            , fuzz safeInt "safe integers" <|
+            , fuzz safeInt "safe Ints" <|
                 \s ->
                     Z.fromInt s
                         |> Maybe.map Z.toInt
@@ -372,7 +315,7 @@ stringConversionSuite =
 comparisonSuite : Test
 comparisonSuite =
     describe "compare"
-        [ fuzz2 safeInt safeInt "for all safe integers a and b, compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)" <|
+        [ fuzz2 safeInt safeInt "for all safe Ints, a and b, compare a b == compare (Z.fromSafeInt a) (Z.fromSafeInt b)" <|
             \a b ->
                 let
                     x =
@@ -521,7 +464,7 @@ predicatesSuite =
 absSuite : Test
 absSuite =
     describe "abs"
-        [ fuzz safeInt "for all safe integers s, |s| == Z.toInt |Z.fromSafeInt s|" <|
+        [ fuzz safeInt "for all safe Ints, s, |s| == Z.toInt |Z.fromSafeInt s|" <|
             \s ->
                 abs s |> Expect.equal (Z.toInt <| Z.abs <| Z.fromSafeInt s)
         , fuzz integer "∀ z ∊ ℤ, |z| >= 0" <|
@@ -535,7 +478,7 @@ absSuite =
 negateSuite : Test
 negateSuite =
     describe "negate"
-        [ fuzz safeInt "for all safe integers s, -s == Z.toInt (Z.negate (Z.fromSafeInt s))" <|
+        [ fuzz safeInt "for all safe Ints, s, -s == Z.toInt (Z.negate (Z.fromSafeInt s))" <|
             \s ->
                 -s |> Expect.equal (Z.toInt <| Z.negate <| Z.fromSafeInt s)
         , fuzz integer "∀ z ∊ ℤ, -(-z) == z" <|
