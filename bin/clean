@@ -13,4 +13,4 @@ cd "${project:?}" &&              \
     examples/calculator/elm-stuff \
     node_modules
 
-echo "Please restart your Nix development shell"
+echo "Please restart your Nix development shell."
