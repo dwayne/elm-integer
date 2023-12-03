@@ -20,7 +20,7 @@ module Integer exposing
 
 # Constants
 
-The integers from `-10` to `10` inclusive are named.
+The integers from [`-10`](#negativeTen) to [`10`](#ten) inclusive are named.
 
 @docs zero, one, two, three, four, five, six, seven, eight, nine, ten
 @docs negativeOne, negativeTwo, negativeThree, negativeFour, negativeFive, negativeSix, negativeSeven, negativeEight, negativeNine, negativeTen
@@ -28,7 +28,7 @@ The integers from `-10` to `10` inclusive are named.
 
 # Limits
 
-Let `n : Int`. If `minSafeInt <= n && n <= maxSafeInt` then `n` is called a **safe `Int`**.
+Let `n : Int`. If `minSafeInt <= n <= maxSafeInt` then `n` is called a **safe `Int`**.
 
 @docs maxSafeInt, minSafeInt
 
@@ -257,7 +257,7 @@ negativeTen =
 
 
 {-| The largest `Int`, currently `2^53 - 1 = 9007199254740991`, which can be given as input to
-[`fromInt`](#fromInt) and [`fromSafeInt`](#fromSafeInt) without causing problems.
+[`fromSafeInt`](#fromSafeInt) and [`fromInt`](#fromInt) without causing problems.
 -}
 maxSafeInt : Int
 maxSafeInt =
@@ -265,7 +265,7 @@ maxSafeInt =
 
 
 {-| The smallest `Int`, currently `-2^53 + 1 = -9007199254740991`, which can be given as input to
-[`fromInt`](#fromInt) and [`fromSafeInt`](#fromSafeInt) without causing problems.
+[`fromSafeInt`](#fromSafeInt) and [`fromInt`](#fromInt) without causing problems.
 -}
 minSafeInt : Int
 minSafeInt =
@@ -397,11 +397,11 @@ digit ::= [0-9a-zA-Z]
 
 Valid strings when `b = 16`:
 
-`"123"`, `"-123"`, `"0"`, `"-0"`, `"-0b11"`, and `"-0xF"`.
+`"0"`, `"-0"`, `"123"`, `"-123"`, and `"-Ff"`.
 
 Invalid strings when `b = 16`:
 
-  - `"+2"`, since `'+'` is not part of the allowed syntax,
+  - `"+2"`, because `'+'` is not part of the allowed syntax,
   - `"5g"`, because `'g'` is not a hexadecimal digit.
 
 
@@ -657,7 +657,7 @@ Learn more about a [googol](https://en.wikipedia.org/wiki/Googol).
 
 ### What's considered a large constant?
 
-Since `fromSafeInt n` can be used for `minSafeInt <= n <= maxSafeInt` then it makes sense
+Let `n : Int`, since `fromSafeInt n` can be used for `minSafeInt <= n <= maxSafeInt` then it makes sense
 to consider any number smaller than [`minSafeInt`](#minSafeInt) or larger than [`maxSafeInt`](#maxSafeInt),
 a large constant.
 
@@ -819,7 +819,7 @@ min x y =
 -- PREDICATES
 
 
-{-| Determine if the integer is negative (i.e. less than `0`).
+{-| Determine if the integer is negative (i.e. less than [`0`](#zero)).
 
     isNegative negativeTwo == True
 
@@ -833,7 +833,7 @@ isNegative =
     isLessThan zero
 
 
-{-| Determine if the integer is non-negative (i.e. not negative, so greater than or equal to `0`).
+{-| Determine if the integer is non-negative (i.e. not negative, so greater than or equal to [`0`](#zero)).
 
     isNonNegative negativeTwo == False
 
@@ -861,7 +861,7 @@ isZero =
     (==) zero
 
 
-{-| Determine if the integer is non-zero (i.e. not `0`, so either positive or negative).
+{-| Determine if the integer is non-zero (i.e. not [`0`](#zero), so either positive or negative).
 
     isNonZero zero == False
 
@@ -875,7 +875,7 @@ isNonZero =
     not << isZero
 
 
-{-| Determine if the integer is positive (i.e. greater than `0`).
+{-| Determine if the integer is positive (i.e. greater than [`0`](#zero)).
 
     isPositive five == True
 
@@ -889,7 +889,7 @@ isPositive =
     isGreaterThan zero
 
 
-{-| Determine if the integer is non-positive (i.e. not positive, so less than or equal to `0`).
+{-| Determine if the integer is non-positive (i.e. not positive, so less than or equal to [`0`](#zero)).
 
     isNonPositive five == False
 
@@ -903,7 +903,7 @@ isNonPositive =
     not << isPositive
 
 
-{-| Determine if the integer is even (i.e. divisible by `2`).
+{-| Determine if the integer is even (i.e. divisible by [`2`](#two)).
 
     isEven zero == True
 
@@ -929,7 +929,7 @@ isEven z =
             N.isEven n
 
 
-{-| Determine if the integer is odd (i.e. not even, so not divisible by `2`).
+{-| Determine if the integer is odd (i.e. not even, so not divisible by [`2`](#two)).
 
     isOdd zero == False
 
@@ -955,7 +955,7 @@ isOdd =
 If you want it as a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural),
 use [`toNatural`](#toNatural).
 
-You can think of the absolute value of an integer as its distance from `0`.
+You can think of the absolute value of an integer as its distance from [`0`](#zero).
 
     abs zero == zero
 
@@ -977,7 +977,7 @@ abs z =
 
 {-| Compute the [additive inverse](https://en.wikipedia.org/wiki/Additive_inverse) of the given integer.
 
-The additive inverse of an integer, `z`, is the integer that, when added to `z`, yields `0`.
+The additive inverse of an integer, `z`, is the integer that, when added to `z`, yields [`0`](#zero).
 
     negate five == negativeFive
     -- Because 5 + (-5) = 0.
@@ -1069,8 +1069,10 @@ add x y =
 {-| Subtract the second integer from the first.
 
     sub ten four == six
+    -- 10 - 4 = 6
 
     sub four ten == negativeSix
+    -- 4 - 10 = -6
 
 -}
 sub : Integer -> Integer -> Integer
@@ -1123,14 +1125,13 @@ mul x y =
             Positive <| N.mul a b
 
 
-{-| Find the quotient and remainder when the second integer is divided by the first.
+{-| Find the quotient and remainder when the second integer (the **dividend**) is divided by the first (the **divisor**).
 
 This operation performs [Euclidean division](https://en.wikipedia.org/wiki/Euclidean_division)
 or **division with remainder**.
 
-`divModBy d D` of two integers `D` (the dividend) and `d ≠ 0` (the divisor),
-is defined as producing two unique integers `q` (the quotient) and `r` (the remainder)
-such that
+`divModBy d D` of two integers `D` and `d ≠ 0`, is defined as producing
+two unique integers `q` (the **quotient**) and `r` (the **remainder**) such that
 
   - `d * q` is the greatest multiple of `d` less than or equal to `D`, and
   - `r = D - d * q` such that `0 <= r < |d|` (i.e. `r` is always non-negative).
@@ -1261,7 +1262,7 @@ divModBy divisor dividend =
 
 {-| Find the quotient when the second integer is divided by the first.
 
-**N.B.** _Please see [`divModBy`](#divModBy) to understand how we define Euclidean division._
+**N.B.** _Please see [`divModBy`](#divModBy) to understand how the quotient is computed._
 
 -}
 divBy : Integer -> Integer -> Maybe Integer
@@ -1272,7 +1273,7 @@ divBy divisor dividend =
 
 {-| Find the remainder when the second integer is divided by the first.
 
-**N.B.** _Please see [`divModBy`](#divModBy) to understand how we define Euclidean division._
+**N.B.** _Please see [`divModBy`](#divModBy) to understand how the remainder is computed._
 
 -}
 modBy : Integer -> Integer -> Maybe Integer
@@ -1281,11 +1282,10 @@ modBy divisor dividend =
         |> Maybe.map Tuple.second
 
 
-{-| Find the quotient and remainder when the second integer is divided by the first.
+{-| Find the quotient and remainder when the second integer (the **dividend**) is divided by the first (the **divisor**).
 
-`quotRemBy d D` of two integers `D` (the dividend) and `d ≠ 0` (the divisor),
-is defined as producing two unique integers `q` (the quotient) and `r` (the remainder)
-such that
+`quotRemBy d D` of two integers `D` and `d ≠ 0`, is defined as producing
+two unique integers `q` (the **quotient**) and `r` (the **remainder**) such that
 
   - `|d * q|` is the greatest multiple of `d` less than or equal to `|D|`, and
   - `r = D - d * q` such that `0 <= |r| < |d|` (i.e. `r` can be negative).
@@ -1416,7 +1416,7 @@ quotRemBy divisor dividend =
 
 {-| Find the quotient when the second integer is divided by the first.
 
-**N.B.** _Please see [`quotRemBy`](#quotRemBy) to understand how `quotBy` works._
+**N.B.** _Please see [`quotRemBy`](#quotRemBy) to understand how the quotient is computed._
 
 -}
 quotBy : Integer -> Integer -> Maybe Integer
@@ -1427,7 +1427,7 @@ quotBy divisor dividend =
 
 {-| Find the remainder when the second integer is divided by the first.
 
-**N.B.** _Please see [`quotRemBy`](#quotRemBy) to understand how `remBy` works._
+**N.B.** _Please see [`quotRemBy`](#quotRemBy) to understand how the remainder is computed._
 
 -}
 remBy : Integer -> Integer -> Maybe Integer
@@ -1436,7 +1436,7 @@ remBy divisor dividend =
         |> Maybe.map Tuple.second
 
 
-{-| Integer exponentiation. Find the power of the integer (called the base) to the natural number (called the exponent).
+{-| Integer exponentiation. Find the power of the integer (the **base**) to the natural number (the **exponent**).
 
 Given,
 
@@ -1458,7 +1458,7 @@ In particular,
 
 **N.B.** _You can read "[What is `0^0`?](https://maa.org/book/export/html/116806)" to learn more_.
 
-For all `n : Natural`, where `n` is non-zero,
+For all `n : Natural`, where `n` is positive,
 
     exp zero n == zero
 
@@ -1538,8 +1538,8 @@ toInt z =
 
 
 {-| Compute the [absolute value](https://en.wikipedia.org/wiki/Absolute_value) of the given integer as a
-[natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural).
-If you want an [`Integer`](#Integer), use [`abs`](#abs).
+[natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural#Natural).
+If you want an [integer](#Integer), use [`abs`](#abs).
 -}
 toNatural : Integer -> Natural
 toNatural z =

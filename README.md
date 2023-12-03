@@ -136,42 +136,40 @@ Decimal   ::= [0-9]+
 
 **N.B.** *You must be in the Nix development shell (`nix develop`) to run the scripts mentioned below.*
 
-#### Run tests
-
-```sh
-test-examples-calculator
-```
-
 #### Build
 
-```sh
-build-examples-calculator
-```
-
-#### Serve
+Build the calculator web application.
 
 ```sh
-serve-examples-calculator
+$ build-examples-calculator
 ```
 
-Then, open `http://localhost:8000` in your browser to use the web application.
+#### Run
+
+Serve the calculator web application.
+
+```sh
+$ serve-examples-calculator
+```
+
+Then, open `http://localhost:8000` in your browser to run the calculator.
 
 ## Performance
 
-**TL;DR** The performance of this library depends solely on the performance of [elm-natural][elm-natural].
+**TL;DR** The performance of this library depends solely on the performance of [`elm-natural`][elm-natural].
 
-This library is built on elm-natural and each function that is implemented using functions from elm-natural only introduces
+This library is built on `elm-natural` and each function that is implemented using functions from `elm-natural` only introduces
 a constant amount of overhead. As a result, the performance characteristics of a given function, `f`, from this library are
 directly related to
 [the performance characteristics of the functions from elm-natural][elm-natural-performance]
-that are used to implement `f`. Practically speaking, this means that any performance gains in elm-natural will necessarily
-lead to corresponding performance gains within elm-integer.
+that are used to implement `f`. Practically speaking, this means that any performance gains in `elm-natural` will necessarily
+lead to corresponding performance gains within `elm-integer`.
 
 ## Resources
 
-- Chapter 18 - Arbitrary-Precision Arithmetic of [C Interfaces and Implementations: Techniques for Creating Reusable Software](https://archive.org/details/cinterfacesimple0000hans) helped me figure out how to design, organize and build the library using the natural numbers as a starting point.
-- [Euclidean Division: Integer Division with Remainders](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/) by Probabilistic World helped me to understand all the intricacies involved with implementing Euclidean division over the integers.
+- Chapter 18 - Arbitrary-Precision Arithmetic of [C Interfaces and Implementations: Techniques for Creating Reusable Software](https://archive.org/details/cinterfacesimple0000hans) helped me to design, organize and implement the library.
+- [Euclidean Division: Integer Division with Remainders](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/) by Probabilistic World helped me to understand all the competing definitions of integer division with remainders.
 
-[elm-natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1
-[Natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural
-[elm-natural-performance]: https://github.com/dwayne/elm-natural/tree/1.0.1#performance
+[elm-natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.0
+[Natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.0/Natural
+[elm-natural-performance]: https://github.com/dwayne/elm-natural/tree/1.1.0#performance
