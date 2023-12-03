@@ -170,6 +170,6 @@ lead to corresponding performance gains within `elm-integer`.
 - Chapter 18 - Arbitrary-Precision Arithmetic of [C Interfaces and Implementations: Techniques for Creating Reusable Software](https://archive.org/details/cinterfacesimple0000hans) helped me to design, organize and implement the library.
 - [Euclidean Division: Integer Division with Remainders](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/) by Probabilistic World helped me to understand all the competing definitions of integer division with remainders.
 
-[elm-natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.0
-[Natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.0/Natural
-[elm-natural-performance]: https://github.com/dwayne/elm-natural/tree/1.1.0#performance
+[elm-natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.1
+[Natural]: https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.1/Natural
+[elm-natural-performance]: https://github.com/dwayne/elm-natural/tree/1.1.1#performance

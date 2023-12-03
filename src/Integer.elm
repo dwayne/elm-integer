@@ -343,7 +343,7 @@ fromSafeInt =
     fromInt >> Maybe.withDefault Zero
 
 
-{-| If you happen to have a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural)
+{-| If you happen to have a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.1/Natural)
 at hand then you can convert it to an integer using this function.
 
 For all `n : Natural`:
@@ -952,7 +952,7 @@ isOdd =
 
 
 {-| Compute the [absolute value](https://en.wikipedia.org/wiki/Absolute_value) of the given integer.
-If you want it as a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural),
+If you want it as a [natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.1/Natural),
 use [`toNatural`](#toNatural).
 
 You can think of the absolute value of an integer as its distance from [`0`](#zero).
@@ -1127,9 +1127,6 @@ mul x y =
 
 {-| Find the quotient and remainder when the second integer (the **dividend**) is divided by the first (the **divisor**).
 
-This operation performs [Euclidean division](https://en.wikipedia.org/wiki/Euclidean_division)
-or **division with remainder**.
-
 `divModBy d D` of two integers `D` and `d ≠ 0`, is defined as producing
 two unique integers `q` (the **quotient**) and `r` (the **remainder**) such that
 
@@ -1138,44 +1135,31 @@ two unique integers `q` (the **quotient**) and `r` (the **remainder**) such that
 
 For e.g.
 
-    (ten |> divModBy two) == Just (five, zero)
-    -- Because 2 * 5 is the greatest multiple of 2 less than or equal to 10,
-    -- and 0 = 10 - (2 * 5).
+    (ten |> divModBy two) == Just ( five, zero )
 
-    (ten |> divModBy negativeTwo) == Just (negativeFive, zero)
-    -- Because -2 * -5 is the greatest multiple of -2 less than or equal to 10,
-    -- and 0 = 10 - (-2 * -5).
+    (ten |> divModBy negativeTwo) == Just ( negativeFive, zero )
 
-    (negativeTen |> divModBy two) == Just (negativeFive, zero)
-    -- Because 2 * -5 is the greatest multiple of 2 less than or equal to -10,
-    -- and 0 = -10 - (2 * -5).
+    (negativeTen |> divModBy two) == Just ( negativeFive, zero )
 
-    (negativeTen |> divModBy negativeTwo) == Just (five, zero)
-    -- Because -2 * 5 is the greatest multiple of -2 less than or equal to -10,
-    -- and 0 = -10 - (-2 * 5).
+    (negativeTen |> divModBy negativeTwo) == Just ( five, zero )
 
-    (ten |> divModBy three) == Just (three, one)
-    -- Because 3 * 3 is the greatest multiple of 3 less than or equal to 10,
-    -- and 1 = 10 - (3 * 3).
+    (ten |> divModBy three) == Just ( three, one )
 
-    (ten |> divModBy negativeThree) == Just (negativeThree, one)
-    -- Because -3 * -3 is the greatest multiple of -3 less than or equal to 10,
-    -- and 1 = 10 - (-3 * -3).
+    (ten |> divModBy negativeThree) == Just ( negativeThree, one )
 
-    (negativeTen |> divModBy three) == Just (negativeFour, two)
-    -- Because 3 * -4 is the greatest multiple of 3 less than or equal to -10,
-    -- and 2 = -10 - (3 * -4).
+    (negativeTen |> divModBy three) == Just ( negativeFour, two )
 
-    (negativeTen |> divModBy negativeThree) == Just (four, two)
-    -- Because -3 * 4 is the greatest multiple of -3 less than or equal to -10,
-    -- and 2 = -10 - (-3 * 4).
+    (negativeTen |> divModBy negativeThree) == Just ( four, two )
 
 Division by `0` is not allowed. So, for all `z : Integer`,
 
     (z |> divModBy zero) == Nothing
 
-**N.B.** _This [Euclidean division article by Probabilistic World](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/)
-is well written and can help you understand `divModBy` in greater depth._
+**N.B.** _`divModBy` defines [Euclidean division] (or E-division) according to Daan Leijen's paper,
+[Division and Modulus for Computer Scientists]._
+
+[Euclidean division]: https://en.wikipedia.org/wiki/Euclidean_division
+[Division and Modulus for Computer Scientists]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
 
 -}
 divModBy : Integer -> Integer -> Maybe ( Integer, Integer )
@@ -1292,44 +1276,30 @@ two unique integers `q` (the **quotient**) and `r` (the **remainder**) such that
 
 For e.g.
 
-    (ten |> quotRemBy two) == Just (five, zero)
-    -- Because |2 * 5| is the greatest multiple of 2 less than or equal to |10|,
-    -- and 0 = 10 - (2 * 5).
+    (ten |> quotRemBy two) == Just ( five, zero )
 
-    (ten |> quotRemBy negativeTwo) == Just (negativeFive, zero)
-    -- Because |-2 * -5| is the greatest multiple of -2 less than or equal to |10|,
-    -- and 0 = 10 - (-2 * -5).
+    (ten |> quotRemBy negativeTwo) == Just ( negativeFive, zero )
 
-    (negativeTen |> quotRemBy two) == Just (negativeFive, zero)
-    -- Because |2 * -5| is the greatest multiple of 2 less than or equal to |-10|,
-    -- and 0 = -10 - (2 * -5).
+    (negativeTen |> quotRemBy two) == Just ( negativeFive, zero )
 
-    (negativeTen |> quotRemBy negativeTwo) == Just (five, zero)
-    -- Because |-2 * 5| is the greatest multiple of -2 less than or equal to |-10|,
-    -- and 0 = -10 - (-2 * 5).
+    (negativeTen |> quotRemBy negativeTwo) == Just ( five, zero )
 
-    (ten |> quotRemBy three) == Just (three, one)
-    -- Because |3 * 3| is the greatest multiple of 3 less than or equal to |10|,
-    -- and 1 = 10 - (3 * 3).
+    (ten |> quotRemBy three) == Just ( three, one )
 
-    (ten |> quotRemBy negativeThree) == Just (negativeThree, one)
-    -- Because |-3 * -3| is the greatest multiple of -3 less than or equal to |10|,
-    -- and 1 = 10 - (-3 * -3).
+    (ten |> quotRemBy negativeThree) == Just ( negativeThree, one )
 
-    (negativeTen |> quotRemBy three) == Just (negativeThree, negativeOne)
-    -- Because |3 * -3| is the greatest multiple of 3 less than or equal to |-10|,
-    -- and -1 = -10 - (3 * -3).
+    (negativeTen |> quotRemBy three) == Just ( negativeThree, negativeOne )
 
-    (negativeTen |> quotRemBy negativeThree) == Just (three, negativeOne)
-    -- Because |-3 * 3| is the greatest multiple of -3 less than or equal to |-10|,
-    -- and -1 = -10 - (-3 * 3).
+    (negativeTen |> quotRemBy negativeThree) == Just ( three, negativeOne )
 
 Division by `0` is not allowed. So, for all `z : Integer`,
 
     (z |> quotRemBy zero) == Nothing
 
-**N.B.** _This [Euclidean division article by Probabilistic World](https://www.probabilisticworld.com/euclidean-division-integer-division-with-remainders/)
-is well written and can help you understand `quotRemBy` in greater depth._
+**N.B.** _`quotRemBy` defines truncated division (or T-division) according to Daan Leijen's paper,
+[Division and Modulus for Computer Scientists]._
+
+[Division and Modulus for Computer Scientists]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
 
 -}
 quotRemBy : Integer -> Integer -> Maybe ( Integer, Integer )
@@ -1538,7 +1508,7 @@ toInt z =
 
 
 {-| Compute the [absolute value](https://en.wikipedia.org/wiki/Absolute_value) of the given integer as a
-[natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.0.1/Natural#Natural).
+[natural number](https://package.elm-lang.org/packages/dwayne/elm-natural/1.1.1/Natural#Natural).
 If you want an [integer](#Integer), use [`abs`](#abs).
 -}
 toNatural : Integer -> Natural
