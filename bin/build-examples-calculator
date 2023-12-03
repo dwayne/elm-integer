@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# USAGE: [root=path] [optimize_js=0|1|2|3] build-examples-calculator
+# USAGE: [root=path] [optimize_js=0*|1|2|3] build-examples-calculator
 #
 
 set -euo pipefail
