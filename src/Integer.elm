@@ -658,7 +658,7 @@ Learn more about a [googol](https://en.wikipedia.org/wiki/Googol).
 ### What's considered a large constant?
 
 Let `n : Int`, since `fromSafeInt n` can be used for `minSafeInt <= n <= maxSafeInt` then it makes sense
-to consider any number smaller than [`minSafeInt`](#minSafeInt) or larger than [`maxSafeInt`](#maxSafeInt),
+to consider any integer smaller than [`minSafeInt`](#minSafeInt) or larger than [`maxSafeInt`](#maxSafeInt),
 a large constant.
 
 -}
